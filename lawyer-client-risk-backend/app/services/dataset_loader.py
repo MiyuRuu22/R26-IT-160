@@ -5,6 +5,7 @@ from pathlib import Path
 SUPREME_PATH = Path("app/data/processed/supreme_docs.csv")
 APPEAL_PATH = Path("app/data/processed/appeal_docs.csv")
 COMBINED_PATH = Path("app/data/processed/all_docs.csv")
+VALIDATED_PATH = Path("app/data/processed/all_docs_validated.csv")
 
 
 def _prepare_df(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
@@ -21,12 +22,10 @@ def _prepare_df(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
     existing_cols = [c for c in keep_cols if c in df.columns]
     df = df[existing_cols].copy()
 
-    # make sure all expected columns exist
     for col in keep_cols:
         if col not in df.columns:
             df[col] = ""
 
-    # fill missing values safely
     for col in keep_cols:
         df[col] = df[col].fillna("").astype(str)
 
@@ -84,6 +83,10 @@ def load_all_datasets() -> pd.DataFrame:
 
 
 def load_local_dataset() -> pd.DataFrame:
+    if VALIDATED_PATH.exists():
+        print("Loading validated dataset...")
+        return pd.read_csv(VALIDATED_PATH, dtype=str).fillna("")
+
     if COMBINED_PATH.exists():
         print("Loading combined local dataset...")
         return pd.read_csv(COMBINED_PATH, dtype=str).fillna("")

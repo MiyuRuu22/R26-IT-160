@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://10.35.252.19:8000';
+const BASE_URL = 'http://172.24.122.19:8000';
 
 export const searchClients = async (payload: {
   fullName: string;

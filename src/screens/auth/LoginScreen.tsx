@@ -39,16 +39,8 @@ const LoginScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.heroCard}>
-        <Text style={styles.heroLabel}>Smart Lawyer Companion</Text>
-        <Text style={styles.heroTitle}>Lawyer Login</Text>
-        <Text style={styles.heroSubtitle}>
-          Securely access client verification, past case history, and AI-based risk assessment.
-        </Text>
-      </View>
-
       <View style={styles.formCard}>
-        <Text style={styles.sectionTitle}>Welcome Back</Text>
+        <Text style={styles.sectionTitle}>Lawyer Login</Text>
         <Text style={styles.sectionSubtitle}>
           Sign in to continue to your legal workspace.
         </Text>
@@ -103,45 +95,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  heroCard: {
-    backgroundColor: '#1E3A8A',
-    borderRadius: 22,
-    padding: 22,
-    marginBottom: 18,
-  },
-  heroLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#BFDBFE',
-    marginBottom: 6,
-  },
-  heroTitle: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#DBEAFE',
-    lineHeight: 22,
-  },
   formCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 22,
-    padding: 20,
+    padding: 22,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: '800',
     color: '#0F172A',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   sectionSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
-    marginBottom: 18,
-    lineHeight: 21,
+    marginBottom: 22,
+    lineHeight: 22,
   },
   inputGroup: {
     marginBottom: 14,

@@ -1,4 +1,5 @@
 import re
+import requests
 import pandas as pd
 from rapidfuzz import fuzz
 from app.services.dataset_loader import load_local_dataset
@@ -31,7 +32,6 @@ def normalize_name_key(name: str) -> str:
 
 def clean_person_name(name: str) -> str:
     name = str(name or "").strip()
-
     name = re.sub(r"\(.*?\)", "", name)
 
     remove_words = [
@@ -58,8 +58,7 @@ def clean_person_name(name: str) -> str:
     for word in remove_words:
         lowered = lowered.replace(word, "")
 
-    name = lowered
-    name = re.sub(r"[^a-zA-Z0-9.\s]", " ", name)
+    name = re.sub(r"[^a-zA-Z0-9.\s]", " ", lowered)
     name = re.sub(r"\s+", " ", name).strip()
 
     return name.title()
@@ -74,19 +73,18 @@ def extract_primary_client_name(parties: str) -> str:
     split_patterns = [
         r"\s+vs\.\s+",
         r"\s+vs\s+",
-        r"\s+Vs\.\s+",
-        r"\s+Vs\s+",
+        r"\s+v\.\s+",
+        r"\s+v\s+",
         r"\s+VS\.\s+",
         r"\s+VS\s+",
-        r"\s+v\.\s+",
         r"\s+V\.\s+",
-        r"\s+v\s+",
         r"\s+V\s+",
     ]
 
     candidate = parties
+
     for pattern in split_patterns:
-        parts = re.split(pattern, candidate, maxsplit=1)
+        parts = re.split(pattern, candidate, maxsplit=1, flags=re.IGNORECASE)
         if len(parts) > 1:
             candidate = parts[0]
             break
@@ -94,6 +92,7 @@ def extract_primary_client_name(parties: str) -> str:
     candidate = candidate.split(",")[0]
     candidate = candidate.split(";")[0]
     candidate = clean_person_name(candidate)
+
     return candidate.strip()
 
 
@@ -108,6 +107,7 @@ def is_valid_client_name(name: str) -> bool:
             return False
 
     words = name_n.split()
+
     if len(words) > 6:
         return False
 
@@ -116,49 +116,118 @@ def is_valid_client_name(name: str) -> bool:
 
 def safe_pdf_url(url: str) -> str:
     url = str(url or "").strip()
+
     if not url:
         return ""
 
     lower_url = url.lower()
 
-    # reject obviously broken or missing links
-    if "404" in lower_url or "notfound" in lower_url or "not-found" in lower_url:
+    if (
+        "404" in lower_url
+        or "notfound" in lower_url
+        or "not-found" in lower_url
+    ):
         return ""
 
-    # allow common pdf/http links
-    if lower_url.startswith("http://") or lower_url.startswith("https://"):
-        return url
+    if not (
+        lower_url.startswith("http://")
+        or lower_url.startswith("https://")
+    ):
+        return ""
 
-    return ""
+    try:
+        response = requests.get(
+            url,
+            timeout=8,
+            allow_redirects=True,
+            headers={
+                "User-Agent": "Mozilla/5.0",
+                "Accept": "application/pdf,text/html,*/*",
+            },
+        )
+
+        final_url = response.url.lower()
+        content_type = response.headers.get("content-type", "").lower()
+
+        if response.status_code != 200:
+            return ""
+
+        # Real valid PDF
+        if "application/pdf" in content_type:
+            return response.url
+
+        # Some sites return PDF but missing proper content-type
+        if final_url.endswith(".pdf") and "text/html" not in content_type:
+            return response.url
+
+        # If redirected to homepage or HTML page, reject
+        if "text/html" in content_type:
+            return ""
+
+        return ""
+
+    except Exception:
+        return ""
 
 
 def infer_court_location(row: pd.Series) -> str:
     text = f"{row.get('num', '')} {row.get('description', '')} {row.get('parties', '')}".lower()
 
-    if "colombo" in text:
-        return "Colombo"
-    if "kandy" in text:
-        return "Kandy"
-    if "galle" in text:
-        return "Galle"
-    if "negombo" in text:
-        return "Negombo"
-    if "anuradhapura" in text:
-        return "Anuradhapura"
-    if "kurunegala" in text:
-        return "Kurunegala"
-    if "jaffna" in text:
-        return "Jaffna"
+    court_locations = [
+        "Colombo", "Fort", "Maligakanda", "Mount Lavinia", "Negombo", "Ja-Ela",
+        "Gampaha", "Attanagalla", "Minuwangoda", "Mirigama",
+        "Kalutara", "Panadura", "Horana", "Matugama", "Aluthgama",
+        "Kandy", "Peradeniya", "Gampola", "Nawalapitiya", "Teldeniya",
+        "Matale", "Dambulla",
+        "Nuwara Eliya", "Hatton",
+        "Galle", "Ambalangoda", "Elpitiya",
+        "Matara", "Akuressa", "Weligama",
+        "Hambantota", "Tangalle", "Tissamaharama",
+        "Jaffna", "Chavakachcheri", "Point Pedro", "Kayts",
+        "Kilinochchi",
+        "Mannar",
+        "Vavuniya",
+        "Batticaloa", "Eravur", "Valachchenai",
+        "Kalmunai", "Akkaraipattu", "Samanthurai",
+        "Trincomalee", "Kinniya", "Mutur",
+        "Kurunegala", "Kuliyapitiya", "Nikaweratiya",
+        "Puttalam", "Chilaw", "Marawila",
+        "Anuradhapura", "Kekirawa", "Medawachchiya",
+        "Polonnaruwa", "Hingurakgoda",
+        "Badulla", "Bandarawela", "Haputale",
+        "Monaragala", "Wellawaya",
+        "Ratnapura", "Balangoda", "Embilipitiya",
+        "Kegalle", "Mawanella", "Warakapola",
+    ]
+
+    court_locations = sorted(court_locations, key=len, reverse=True)
+
+    for location in court_locations:
+        if location.lower() in text:
+            return location
+
     return "Unknown"
 
 
 def infer_case_type(text: str) -> str:
     t = str(text or "").lower()
 
-    if "criminal" in t or "conviction" in t or "offence" in t or "attorney general" in t:
+    if (
+        "criminal" in t
+        or "conviction" in t
+        or "offence" in t
+        or "attorney general" in t
+    ):
         return "Criminal"
-    if "commercial" in t or "company" in t or "contract" in t or "insurance" in t:
+
+    if (
+        "commercial" in t
+        or "company" in t
+        or "contract" in t
+        or "insurance" in t
+    ):
         return "Commercial"
+
     return "Civil"
 
 
@@ -168,7 +237,11 @@ def build_client_key(display_name: str, court_location: str) -> str:
     return f"{name_key}__{location_key}"
 
 
-def search_matching_clients(full_name: str, court_location: str = "", case_type_hint: str = ""):
+def search_matching_clients(
+    full_name: str,
+    court_location: str = "",
+    case_type_hint: str = "",
+):
     df = load_local_dataset()
 
     full_name_n = normalize_name_key(full_name)
@@ -235,7 +308,10 @@ def search_matching_clients(full_name: str, court_location: str = "", case_type_
     temp = pd.DataFrame(candidates)
 
     grouped = (
-        temp.groupby(["client_key", "display_name", "court_location"], as_index=False)
+        temp.groupby(
+            ["client_key", "display_name", "court_location"],
+            as_index=False,
+        )
         .agg(
             case_count=("doc_id", "count"),
             best_score=("match_score", "max"),
@@ -246,7 +322,7 @@ def search_matching_clients(full_name: str, court_location: str = "", case_type_
 
     return grouped[
         ["client_key", "display_name", "court_location", "case_count", "source"]
-    ].head(20).to_dict(orient="records")
+    ].head(50).to_dict(orient="records")
 
 
 def get_client_cases_by_key(client_key: str):
@@ -260,6 +336,7 @@ def get_client_cases_by_key(client_key: str):
         description = str(row.get("description", ""))
 
         display_name = extract_primary_client_name(parties)
+
         if not is_valid_client_name(display_name):
             continue
 
@@ -271,13 +348,28 @@ def get_client_cases_by_key(client_key: str):
 
         case_type = infer_case_type(description)
 
+        # Use validated PDF first
+        validated_url = str(
+            row.get("validated_pdf_url", "")
+        ).strip()
+
+        old_url = str(
+            row.get("url_pdf", "")
+        ).strip()
+
+        if validated_url:
+            pdf_url = validated_url
+        else:
+            pdf_url = safe_pdf_url(old_url)
+
         cases.append(
             {
                 "id": str(row.get("doc_id", "")),
                 "title": str(row.get("num", "Unknown Case")),
                 "type": case_type,
                 "date": str(row.get("date_str", "")),
-                "pdf_url": safe_pdf_url(row.get("url_pdf", "")),
+                "pdf_url": pdf_url,
+                "pdf_available": bool(pdf_url),
                 "description": description,
                 "parties": parties,
                 "source": str(row.get("source", "")),

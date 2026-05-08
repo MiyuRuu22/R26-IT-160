@@ -20,16 +20,45 @@ import {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SearchClient'>;
 
+const COURT_LOCATIONS = [
+  'Colombo', 'Fort', 'Maligakanda', 'Mount Lavinia', 'Negombo', 'Ja-Ela',
+  'Gampaha', 'Attanagalla', 'Minuwangoda', 'Mirigama',
+  'Kalutara', 'Panadura', 'Horana', 'Matugama', 'Aluthgama',
+  'Kandy', 'Peradeniya', 'Gampola', 'Nawalapitiya', 'Teldeniya',
+  'Matale', 'Dambulla', 'Nuwara Eliya', 'Hatton',
+  'Galle', 'Ambalangoda', 'Elpitiya',
+  'Matara', 'Akuressa', 'Weligama',
+  'Hambantota', 'Tangalle', 'Tissamaharama',
+  'Jaffna', 'Chavakachcheri', 'Point Pedro', 'Kayts',
+  'Kilinochchi', 'Mannar', 'Vavuniya',
+  'Batticaloa', 'Eravur', 'Valachchenai',
+  'Kalmunai', 'Akkaraipattu', 'Samanthurai',
+  'Trincomalee', 'Kinniya', 'Mutur',
+  'Kurunegala', 'Kuliyapitiya', 'Nikaweratiya',
+  'Puttalam', 'Chilaw', 'Marawila',
+  'Anuradhapura', 'Kekirawa', 'Medawachchiya',
+  'Polonnaruwa', 'Hingurakgoda',
+  'Badulla', 'Bandarawela', 'Haputale',
+  'Monaragala', 'Wellawaya',
+  'Ratnapura', 'Balangoda', 'Embilipitiya',
+  'Kegalle', 'Mawanella', 'Warakapola',
+];
+
 const SearchClientScreen = ({ navigation }: Props) => {
   const [fullName, setFullName] = useState('');
   const [courtLocation, setCourtLocation] = useState('');
   const [caseTypeHint, setCaseTypeHint] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
+  const [showLocationList, setShowLocationList] = useState(false);
 
   useEffect(() => {
     loadHistory();
   }, []);
+
+  const filteredLocations = COURT_LOCATIONS.filter(location =>
+    location.toLowerCase().includes(courtLocation.toLowerCase())
+  );
 
   const loadHistory = async () => {
     const data = await getSearchHistory();
@@ -67,7 +96,6 @@ const SearchClientScreen = ({ navigation }: Props) => {
         matches: data.matches || [],
       });
     } catch (error) {
-      console.error(error);
       Alert.alert('Error', 'Failed to search clients');
     } finally {
       setLoading(false);
@@ -78,6 +106,7 @@ const SearchClientScreen = ({ navigation }: Props) => {
     setFullName(item.fullName);
     setCourtLocation(item.courtLocation);
     setCaseTypeHint(item.caseTypeHint || '');
+    setShowLocationList(false);
   };
 
   const handleClearHistory = async () => {
@@ -85,15 +114,24 @@ const SearchClientScreen = ({ navigation }: Props) => {
     setHistory([]);
   };
 
+  const handleSelectLocation = (location: string) => {
+    setCourtLocation(location);
+    setShowLocationList(false);
+  };
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
       <View style={styles.topBar}>
-        <View>
-          <Text style={styles.welcomeText}>Lawyer Workspace</Text>
+        <View style={styles.titleArea}>
+          <Text style={styles.smallTitle}>Legal Workspace</Text>
           <Text style={styles.pageTitle}>Search Client</Text>
+          <Text style={styles.pageSubtitle}>
+            Find the correct client and review past case risk.
+          </Text>
         </View>
 
         <TouchableOpacity
@@ -104,30 +142,14 @@ const SearchClientScreen = ({ navigation }: Props) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.heroCard}>
-        <Text style={styles.heroTitle}>Client Verification & Risk Assessment</Text>
-        <Text style={styles.heroSubtitle}>
-          Search by client name, location, and case type to find the correct person and review past cases.
-        </Text>
-
-        <View style={styles.heroBadgeRow}>
-          <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>AI Ready</Text>
-          </View>
-          <View style={styles.heroBadgeSecondary}>
-            <Text style={styles.heroBadgeSecondaryText}>Legal Case Search</Text>
-          </View>
-        </View>
-      </View>
-
       <View style={styles.formCard}>
-        <Text style={styles.sectionHeading}>Search Details</Text>
+        <Text style={styles.cardTitle}>Client Details</Text>
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Client Full Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter full name"
+            placeholder="Enter client name"
             placeholderTextColor="#94A3B8"
             value={fullName}
             onChangeText={setFullName}
@@ -138,11 +160,45 @@ const SearchClientScreen = ({ navigation }: Props) => {
           <Text style={styles.label}>Court Location</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter court location"
+            placeholder="Search or select location"
             placeholderTextColor="#94A3B8"
             value={courtLocation}
-            onChangeText={setCourtLocation}
+            onChangeText={(text) => {
+              setCourtLocation(text);
+              setShowLocationList(true);
+            }}
+            onFocus={() => setShowLocationList(true)}
           />
+
+          {courtLocation.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearLocationButton}
+              onPress={() => {
+                setCourtLocation('');
+                setShowLocationList(false);
+              }}
+            >
+              <Text style={styles.clearLocationText}>Clear</Text>
+            </TouchableOpacity>
+          )}
+
+          {showLocationList && (
+            <View style={styles.locationDropdown}>
+              {filteredLocations.length === 0 ? (
+                <Text style={styles.noLocationText}>No matching location</Text>
+              ) : (
+                filteredLocations.slice(0, 8).map(location => (
+                  <TouchableOpacity
+                    key={location}
+                    style={styles.locationItem}
+                    onPress={() => handleSelectLocation(location)}
+                  >
+                    <Text style={styles.locationText}>{location}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+          )}
         </View>
 
         <View style={styles.inputGroup}>
@@ -156,19 +212,23 @@ const SearchClientScreen = ({ navigation }: Props) => {
           />
         </View>
 
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <TouchableOpacity
+          style={[styles.searchButton, loading && styles.disabledButton]}
+          onPress={handleSearch}
+          disabled={loading}
+        >
           <Text style={styles.searchButtonText}>
-            {loading ? 'Searching...' : 'Search Cases'}
+            {loading ? 'Searching...' : 'Search Client'}
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.blockCard}>
         <View style={styles.historyHeader}>
-          <Text style={styles.sectionHeading}>Recent Searches</Text>
+          <Text style={styles.cardTitle}>Recent Searches</Text>
           {history.length > 0 && (
             <TouchableOpacity onPress={handleClearHistory}>
-              <Text style={styles.clearText}>Clear</Text>
+              <Text style={styles.clearText}>Clear All</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -184,10 +244,7 @@ const SearchClientScreen = ({ navigation }: Props) => {
             >
               <Text style={styles.clientNameText}>{item.fullName}</Text>
               <Text style={styles.clientMetaText}>
-                {item.courtLocation || 'No location'}
-              </Text>
-              <Text style={styles.clientMetaText}>
-                {item.caseTypeHint || 'No case type'}
+                {item.courtLocation || 'No location'} • {item.caseTypeHint || 'No case type'}
               </Text>
             </TouchableOpacity>
           ))
@@ -201,135 +258,145 @@ export default SearchClientScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 18,
-    backgroundColor: '#F1F5F9',
+    padding: 20,
+    backgroundColor: '#EEF2F7',
     flexGrow: 1,
   },
   topBar: {
-    marginTop: 10,
-    marginBottom: 18,
+    marginTop: 8,
+    marginBottom: 22,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
-  welcomeText: {
+  titleArea: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  smallTitle: {
     fontSize: 13,
     color: '#64748B',
+    fontWeight: '700',
     marginBottom: 4,
   },
   pageTitle: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 34,
+    fontWeight: '900',
     color: '#0F172A',
+    marginBottom: 6,
+  },
+  pageSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    lineHeight: 20,
   },
   profileButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: '#1E3A8A',
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '800',
-  },
-  heroCard: {
-    backgroundColor: '#1E3A8A',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 18,
-  },
-  heroTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#DBEAFE',
-    lineHeight: 22,
-    marginBottom: 14,
-  },
-  heroBadgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  heroBadge: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    marginRight: 10,
-    marginBottom: 8,
-  },
-  heroBadgeText: {
-    color: '#1E3A8A',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  heroBadgeSecondary: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    marginBottom: 8,
-  },
-  heroBadgeSecondaryText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 12,
+    fontWeight: '900',
   },
   formCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 18,
+    borderRadius: 28,
+    padding: 22,
     marginBottom: 18,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    elevation: 3,
   },
   blockCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 18,
+    borderRadius: 28,
+    padding: 22,
     marginBottom: 18,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 2,
   },
-  sectionHeading: {
-    fontSize: 20,
-    fontWeight: '800',
+  cardTitle: {
+    fontSize: 21,
+    fontWeight: '900',
     color: '#0F172A',
-    marginBottom: 14,
+    marginBottom: 16,
   },
   inputGroup: {
-    marginBottom: 14,
+    marginBottom: 15,
   },
   label: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#334155',
     marginBottom: 8,
   },
   input: {
     backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
+    borderColor: '#D8DEE8',
+    borderRadius: 16,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
     fontSize: 15,
     color: '#0F172A',
   },
+  clearLocationButton: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  clearLocationText: {
+    color: '#DC2626',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  locationDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D8DEE8',
+    borderRadius: 16,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  locationItem: {
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  locationText: {
+    fontSize: 15,
+    color: '#0F172A',
+    fontWeight: '700',
+  },
+  noLocationText: {
+    padding: 14,
+    color: '#64748B',
+    fontSize: 14,
+  },
   searchButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1D4ED8',
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
+  },
+  disabledButton: {
+    backgroundColor: '#94A3B8',
   },
   searchButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   historyHeader: {
     flexDirection: 'row',
@@ -338,8 +405,8 @@ const styles = StyleSheet.create({
   },
   clearText: {
     color: '#DC2626',
-    fontWeight: '700',
-    fontSize: 14,
+    fontWeight: '800',
+    fontSize: 13,
   },
   emptyText: {
     color: '#64748B',
@@ -347,19 +414,18 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     backgroundColor: '#F8FAFC',
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 14,
     marginBottom: 10,
   },
   clientNameText: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#0F172A',
     marginBottom: 4,
   },
   clientMetaText: {
     fontSize: 13,
     color: '#64748B',
-    marginBottom: 2,
   },
 });
