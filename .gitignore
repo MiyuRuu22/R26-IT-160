@@ -43,6 +43,7 @@ yarn-error.*
 # backend datasets
 app/data/processed/all_docs_validated.csv
 app/data/processed/all_docs_clean.csv
+app/data/processed/*.csv
 
 # python venv
 venv/

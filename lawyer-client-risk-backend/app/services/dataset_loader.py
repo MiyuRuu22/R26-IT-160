@@ -5,7 +5,22 @@ from pathlib import Path
 SUPREME_PATH = Path("app/data/processed/supreme_docs.csv")
 APPEAL_PATH = Path("app/data/processed/appeal_docs.csv")
 COMBINED_PATH = Path("app/data/processed/all_docs.csv")
-VALIDATED_PATH = Path("app/data/processed/all_docs_validated.csv")
+
+
+def _fix_pdf_columns(df: pd.DataFrame) -> pd.DataFrame:
+    if "url_pdf" not in df.columns:
+        df["url_pdf"] = ""
+
+    if "final_pdf_url" in df.columns:
+        df["final_pdf_url"] = df["final_pdf_url"].fillna("").astype(str)
+
+        df["url_pdf"] = df["final_pdf_url"].where(
+            df["final_pdf_url"].str.strip() != "",
+            df["url_pdf"]
+        )
+
+    df["url_pdf"] = df["url_pdf"].fillna("").astype(str)
+    return df
 
 
 def _prepare_df(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
@@ -15,8 +30,15 @@ def _prepare_df(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
         "date_str",
         "description",
         "url_pdf",
+        "final_pdf_url",
+        "matched_pdf_url",
+        "pdf_match_status",
+        "pdf_match_method",
+        "pdf_status",
+        "validated_pdf_url",
         "parties",
         "judgement_by",
+        "source",
     ]
 
     existing_cols = [c for c in keep_cols if c in df.columns]
@@ -29,7 +51,11 @@ def _prepare_df(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
     for col in keep_cols:
         df[col] = df[col].fillna("").astype(str)
 
-    df["source"] = source_name
+    df = _fix_pdf_columns(df)
+
+    if not df["source"].str.strip().any():
+        df["source"] = source_name
+
     return df
 
 
@@ -63,17 +89,20 @@ def load_all_datasets() -> pd.DataFrame:
     if SUPREME_PATH.exists():
         print("Loading local Supreme Court dataset...")
         supreme_df = pd.read_csv(SUPREME_PATH, dtype=str).fillna("")
+        supreme_df = _prepare_df(supreme_df, "supreme")
     else:
         supreme_df = download_supreme_dataset()
 
     if APPEAL_PATH.exists():
         print("Loading local Appeal Court dataset...")
         appeal_df = pd.read_csv(APPEAL_PATH, dtype=str).fillna("")
+        appeal_df = _prepare_df(appeal_df, "appeal")
     else:
         appeal_df = download_appeal_dataset()
 
     combined = pd.concat([supreme_df, appeal_df], ignore_index=True).fillna("")
     combined = combined.astype(str)
+    combined = _fix_pdf_columns(combined)
 
     COMBINED_PATH.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(COMBINED_PATH, index=False)
@@ -83,12 +112,10 @@ def load_all_datasets() -> pd.DataFrame:
 
 
 def load_local_dataset() -> pd.DataFrame:
-    if VALIDATED_PATH.exists():
-        print("Loading validated dataset...")
-        return pd.read_csv(VALIDATED_PATH, dtype=str).fillna("")
-
     if COMBINED_PATH.exists():
-        print("Loading combined local dataset...")
-        return pd.read_csv(COMBINED_PATH, dtype=str).fillna("")
+        print("Loading all_docs.csv dataset...")
+        df = pd.read_csv(COMBINED_PATH, dtype=str).fillna("")
+        df = _prepare_df(df, "combined")
+        return df
 
     return load_all_datasets()
