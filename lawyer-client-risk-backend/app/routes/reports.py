@@ -29,7 +29,7 @@ def client_summary(client_key: str):
     client_name = cases[0].get("display_name", "Unknown Client")
 
     risk_data = calculate_risk(cases, client_name)
-    summary = generate_summary(client_name, risk_data)
+    summary = generate_summary(client_name, risk_data, cases)
     recommendation = generate_recommendation(risk_data)
 
     return {

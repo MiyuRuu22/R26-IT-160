@@ -30,7 +30,7 @@ def get_client_profile(client_key: str):
     court_location = cases[0].get("court_location", "Unknown")
 
     risk_data = calculate_risk(cases, client_name)
-    summary = generate_summary(client_name, risk_data)
+    summary = generate_summary(client_name, risk_data, cases)
 
     formatted_cases = []
     for c in cases:

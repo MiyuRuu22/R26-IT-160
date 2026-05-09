@@ -37,6 +37,7 @@ const screenWidth = Dimensions.get('window').width;
 
 const ClientReportScreen = ({ route }: Props) => {
   const { clientKey } = route.params;
+
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportData | null>(null);
 
@@ -107,29 +108,39 @@ const ClientReportScreen = ({ route }: Props) => {
   const getPieData = () => {
     if (!report) return [];
 
-    return [
-      {
+    const data = [];
+
+    if (report.risk.civil_count > 0) {
+      data.push({
         name: 'Civil',
         count: report.risk.civil_count,
-        color: '#3B82F6',
+        color: '#2563EB',
         legendFontColor: '#334155',
         legendFontSize: 13,
-      },
-      {
+      });
+    }
+
+    if (report.risk.criminal_count > 0) {
+      data.push({
         name: 'Criminal',
         count: report.risk.criminal_count,
-        color: '#EF4444',
+        color: '#DC2626',
         legendFontColor: '#334155',
         legendFontSize: 13,
-      },
-      {
+      });
+    }
+
+    if (report.risk.commercial_count > 0) {
+      data.push({
         name: 'Commercial',
         count: report.risk.commercial_count,
-        color: '#10B981',
+        color: '#F59E0B',
         legendFontColor: '#334155',
         legendFontSize: 13,
-      },
-    ].filter(item => item.count > 0);
+      });
+    }
+
+    return data;
   };
 
   if (loading) {
@@ -149,45 +160,36 @@ const ClientReportScreen = ({ route }: Props) => {
     );
   }
 
-  const riskScore = report.risk.score ?? 0;
-  const progressWidth = `${Math.min(riskScore, 100)}%`;
+  const riskColor = getRiskColor(report.risk.overall_risk);
+
+  const civilCount = report.risk.civil_count ?? 0;
+  const criminalCount = report.risk.criminal_count ?? 0;
+  const commercialCount = report.risk.commercial_count ?? 0;
+
+  const hasMultipleCaseTypes =
+    Number(civilCount > 0) +
+      Number(criminalCount > 0) +
+      Number(commercialCount > 0) >
+    1;
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.heroCard}>
-        <Text style={styles.heroLabel}>AI Generated Legal Report</Text>
-        <Text style={styles.heroTitle}>{report.client_name}</Text>
-        <Text style={styles.heroSubtitle}>
-          Risk assessment summary and legal case overview
-        </Text>
+        <Text style={styles.heroLabel}>AI Client Risk Report</Text>
+        <Text style={styles.title}>Client Report</Text>
+        <Text style={styles.name}>{report.client_name}</Text>
       </View>
 
       <View style={styles.riskCard}>
-        <Text style={styles.sectionTitle}>Overall Risk</Text>
-        <Text
-          style={[
-            styles.riskText,
-            { color: getRiskColor(report.risk.overall_risk) },
-          ]}
-        >
-          {report.risk.overall_risk} Risk
-        </Text>
-
-        <Text style={styles.progressLabel}>Risk Score: {riskScore}%</Text>
-        <View style={styles.progressBarBackground}>
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                width: progressWidth as any,
-                backgroundColor: getRiskColor(report.risk.overall_risk),
-              },
-            ]}
-          />
+        <View style={[styles.riskBadge, { backgroundColor: riskColor }]}>
+          <Text style={styles.riskBadgeText}>
+            {report.risk.overall_risk} Risk
+          </Text>
         </View>
+
+        <Text style={styles.riskScoreText}>
+          Risk Score: {report.risk.score ?? 0}%
+        </Text>
 
         <Text style={styles.detailText}>
           Confidence: {report.risk.confidence ?? 0}
@@ -234,21 +236,49 @@ const ClientReportScreen = ({ route }: Props) => {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Case Type Distribution</Text>
+
         {getPieData().length > 0 ? (
-          <PieChart
-            data={getPieData()}
-            width={screenWidth - 60}
-            height={220}
-            chartConfig={{
-              backgroundGradientFrom: '#FFFFFF',
-              backgroundGradientTo: '#FFFFFF',
-              color: () => '#000000',
-            }}
-            accessor="count"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
+          hasMultipleCaseTypes ? (
+            <PieChart
+              data={getPieData()}
+              width={screenWidth - 60}
+              height={220}
+              chartConfig={{
+                backgroundGradientFrom: '#FFFFFF',
+                backgroundGradientTo: '#FFFFFF',
+                color: () => '#000000',
+              }}
+              accessor="count"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+          ) : (
+            <View style={styles.primaryCategoryCard}>
+              <Text style={styles.primaryLabel}>Primary Legal Activity</Text>
+
+              <Text style={styles.primaryType}>
+                {criminalCount > 0
+                  ? 'Criminal'
+                  : commercialCount > 0
+                  ? 'Commercial'
+                  : 'Civil'}
+              </Text>
+
+              <Text style={styles.primaryCount}>
+                {criminalCount > 0
+                  ? criminalCount
+                  : commercialCount > 0
+                  ? commercialCount
+                  : civilCount}{' '}
+                detected case(s)
+              </Text>
+
+              <Text style={styles.primaryNote}>
+                Only one major case category was detected for this client profile.
+              </Text>
+            </View>
+          )
         ) : (
           <Text style={styles.bodyText}>No case distribution data available</Text>
         )}
@@ -256,13 +286,27 @@ const ClientReportScreen = ({ route }: Props) => {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Detailed Statistics</Text>
-        <Text style={styles.detailText}>Overall Risk: {report.risk.overall_risk}</Text>
-        <Text style={styles.detailText}>Confidence: {report.risk.confidence ?? 0}</Text>
-        <Text style={styles.detailText}>Total Past Cases: {report.risk.case_count}</Text>
-        <Text style={styles.detailText}>Civil Cases: {report.risk.civil_count}</Text>
-        <Text style={styles.detailText}>Criminal Cases: {report.risk.criminal_count}</Text>
-        <Text style={styles.detailText}>Commercial Cases: {report.risk.commercial_count}</Text>
-        <Text style={styles.detailText}>Risk Score: {report.risk.score ?? 0}</Text>
+        <Text style={styles.detailText}>
+          Overall Risk: {report.risk.overall_risk}
+        </Text>
+        <Text style={styles.detailText}>
+          Confidence: {report.risk.confidence ?? 0}
+        </Text>
+        <Text style={styles.detailText}>
+          Total Past Cases: {report.risk.case_count}
+        </Text>
+        <Text style={styles.detailText}>
+          Civil Cases: {report.risk.civil_count}
+        </Text>
+        <Text style={styles.detailText}>
+          Criminal Cases: {report.risk.criminal_count}
+        </Text>
+        <Text style={styles.detailText}>
+          Commercial Cases: {report.risk.commercial_count}
+        </Text>
+        <Text style={styles.detailText}>
+          Risk Score: {report.risk.score ?? 0}
+        </Text>
       </View>
     </ScrollView>
   );
@@ -276,123 +320,173 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     padding: 18,
   },
+
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
   },
+
   loaderText: {
     marginTop: 12,
     color: '#475569',
   },
+
   heroCard: {
-    backgroundColor: '#1E3A8A',
-    borderRadius: 22,
+    backgroundColor: '#0F172A',
+    borderRadius: 24,
     padding: 22,
     marginBottom: 18,
   },
+
   heroLabel: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#BFDBFE',
-    marginBottom: 6,
-  },
-  heroTitle: {
-    fontSize: 28,
     fontWeight: '800',
+    color: '#CBD5E1',
+    marginBottom: 8,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
     color: '#FFFFFF',
     marginBottom: 8,
   },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#DBEAFE',
+
+  name: {
+    fontSize: 16,
+    color: '#CBD5E1',
     lineHeight: 22,
   },
+
   riskCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 18,
+    borderRadius: 22,
+    padding: 18,
+    marginBottom: 16,
   },
+
+  riskBadge: {
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    marginBottom: 12,
+  },
+
+  riskBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+
+  riskScoreText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#0F172A',
+    marginBottom: 6,
+  },
+
+  statsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 14,
+  },
+
+  statCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 16,
+  },
+
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#0F172A',
+  },
+
+  statLabel: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '700',
+  },
+
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 18,
-    marginBottom: 18,
+    marginBottom: 16,
   },
+
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#0F172A',
     marginBottom: 12,
   },
-  riskText: {
-    fontSize: 26,
-    fontWeight: '800',
-    marginBottom: 12,
-  },
-  progressLabel: {
-    fontSize: 14,
-    color: '#334155',
-    marginBottom: 8,
-    fontWeight: '700',
-  },
-  progressBarBackground: {
-    height: 12,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 999,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 999,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  statCard: {
-    backgroundColor: '#FFFFFF',
-    width: '48%',
-    padding: 18,
-    borderRadius: 18,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#2563EB',
-    marginBottom: 6,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#475569',
-    fontWeight: '600',
-  },
+
   bodyText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#475569',
-    lineHeight: 24,
-  },
-  detailText: {
-    fontSize: 15,
-    color: '#334155',
-    marginBottom: 8,
     lineHeight: 22,
   },
-  exportButton: {
-    backgroundColor: '#0F766E',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginBottom: 18,
+
+  detailText: {
+    fontSize: 14,
+    color: '#475569',
+    marginBottom: 6,
   },
+
+  exportButton: {
+    backgroundColor: '#2563EB',
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
   exportButtonText: {
     color: '#FFFFFF',
-    fontWeight: '800',
     fontSize: 15,
+    fontWeight: '900',
+  },
+
+  primaryCategoryCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    padding: 22,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  primaryLabel: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+
+  primaryType: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#0F172A',
+    marginBottom: 8,
+  },
+
+  primaryCount: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#2563EB',
+    marginBottom: 10,
+  },
+
+  primaryNote: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

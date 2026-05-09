@@ -46,7 +46,7 @@ def validate_pdf(url):
 
 
 # TEST FIRST 100 ROWS
-for index, row in df.head(3000).iterrows():
+for index, row in df.head(6000).iterrows():
 
     old_url = str(row.get("url_pdf", "")).strip()
 
