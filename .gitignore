@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+venv311/
+
+# Environment
+.env
+
+# Node
+node_modules/
+
+# Expo
+.expo/
+
+# VSCode
+.vscode/
+
+# Models
+backend/models/
+models/
+
+# FAISS
+backend/faiss_index/
+faiss_index/
+
+# Datasets
+datasets/
+
+# Outputs
+output/
+checkpoints/
+
+# Embeddings
+*.pkl
+*.npy
+
+# Logs
+*.log
