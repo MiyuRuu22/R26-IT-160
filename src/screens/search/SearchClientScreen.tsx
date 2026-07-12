@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -7,7 +7,9 @@ import {
   StyleSheet,
   Alert,
   View,
+  ActivityIndicator,
 } from 'react-native';
+import { colors } from '../../theme/colors';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { searchClients } from '../../services/api/clientApi';
@@ -56,9 +58,13 @@ const SearchClientScreen = ({ navigation }: Props) => {
     loadHistory();
   }, []);
 
-  const filteredLocations = COURT_LOCATIONS.filter(location =>
-    location.toLowerCase().includes(courtLocation.toLowerCase())
-  );
+  const filteredLocations = useMemo(() => {
+    const needle = courtLocation.trim().toLowerCase();
+    if (!needle) return [];
+    return COURT_LOCATIONS.filter((location) =>
+      location.toLowerCase().includes(needle)
+    );
+  }, [courtLocation]);
 
   const loadHistory = async () => {
     const data = await getSearchHistory();
@@ -119,6 +125,9 @@ const SearchClientScreen = ({ navigation }: Props) => {
     setShowLocationList(false);
   };
 
+  const isStep1Done = fullName.trim().length > 0;
+  const isStep2Done = courtLocation.trim().length > 0;
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -143,6 +152,55 @@ const SearchClientScreen = ({ navigation }: Props) => {
       </View>
 
       <View style={styles.formCard}>
+        <View style={styles.stepsRow}>
+          <View style={styles.stepItem}>
+            <View
+              style={[
+                styles.stepDot,
+                isStep1Done ? styles.stepDotActive : styles.stepDotInactive,
+              ]}
+            />
+            <Text style={[styles.stepLabel, isStep1Done && styles.stepLabelActive]}>
+              1. Identity
+            </Text>
+          </View>
+
+          <View style={[styles.stepDivider, isStep1Done && styles.stepDividerActive]} />
+
+          <View style={styles.stepItem}>
+            <View
+              style={[
+                styles.stepDot,
+                isStep2Done ? styles.stepDotActive : styles.stepDotInactive,
+              ]}
+            />
+            <Text style={[styles.stepLabel, isStep2Done && styles.stepLabelActive]}>
+              2. Court
+            </Text>
+          </View>
+
+          <View style={[styles.stepDivider, (isStep1Done || isStep2Done) && styles.stepDividerActive]} />
+
+          <View style={styles.stepItem}>
+            <View
+              style={[
+                styles.stepDot,
+                caseTypeHint.trim().length > 0
+                  ? styles.stepDotActive
+                  : styles.stepDotInactive,
+              ]}
+            />
+            <Text
+              style={[
+                styles.stepLabel,
+                caseTypeHint.trim().length > 0 && styles.stepLabelActive,
+              ]}
+            >
+              3. Type
+            </Text>
+          </View>
+        </View>
+
         <Text style={styles.cardTitle}>Client Details</Text>
 
         <View style={styles.inputGroup}>
@@ -152,46 +210,57 @@ const SearchClientScreen = ({ navigation }: Props) => {
             placeholder="Enter client name"
             placeholderTextColor="#94A3B8"
             value={fullName}
-            onChangeText={setFullName}
+            editable={!loading}
+            onChangeText={(t) => {
+              setFullName(t);
+              setShowLocationList(false);
+            }}
           />
         </View>
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Court Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Search or select location"
-            placeholderTextColor="#94A3B8"
-            value={courtLocation}
-            onChangeText={(text) => {
-              setCourtLocation(text);
-              setShowLocationList(true);
-            }}
-            onFocus={() => setShowLocationList(true)}
-          />
-
-          {courtLocation.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearLocationButton}
-              onPress={() => {
-                setCourtLocation('');
-                setShowLocationList(false);
+          <View style={styles.locationInputRow}>
+            <TextInput
+              style={[styles.input, styles.locationInputFlex]}
+              placeholder="Search or select location"
+              placeholderTextColor="#94A3B8"
+              value={courtLocation}
+              editable={!loading}
+              onChangeText={(text) => {
+                setCourtLocation(text);
+                setShowLocationList(true);
               }}
-            >
-              <Text style={styles.clearLocationText}>Clear</Text>
-            </TouchableOpacity>
-          )}
+              onFocus={() => {
+                if (!loading) setShowLocationList(true);
+              }}
+            />
 
-          {showLocationList && (
+            {courtLocation.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearLocationButton}
+                onPress={() => {
+                  setCourtLocation('');
+                  setShowLocationList(false);
+                }}
+                disabled={loading}
+              >
+                <Text style={styles.clearLocationText}>×</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {showLocationList && courtLocation.trim().length > 0 && (
             <View style={styles.locationDropdown}>
               {filteredLocations.length === 0 ? (
                 <Text style={styles.noLocationText}>No matching location</Text>
               ) : (
-                filteredLocations.slice(0, 8).map(location => (
+                filteredLocations.slice(0, 8).map((location) => (
                   <TouchableOpacity
                     key={location}
                     style={styles.locationItem}
                     onPress={() => handleSelectLocation(location)}
+                    disabled={loading}
                   >
                     <Text style={styles.locationText}>{location}</Text>
                   </TouchableOpacity>
@@ -199,15 +268,20 @@ const SearchClientScreen = ({ navigation }: Props) => {
               )}
             </View>
           )}
+
+          {showLocationList && courtLocation.trim().length === 0 && (
+            <Text style={styles.hintText}>Type to search a court location</Text>
+          )}
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Case Type</Text>
+          <Text style={styles.label}>Case Type (Optional)</Text>
           <TextInput
             style={styles.input}
             placeholder="Civil / Criminal / Commercial"
             placeholderTextColor="#94A3B8"
             value={caseTypeHint}
+            editable={!loading}
             onChangeText={setCaseTypeHint}
           />
         </View>
@@ -216,36 +290,58 @@ const SearchClientScreen = ({ navigation }: Props) => {
           style={[styles.searchButton, loading && styles.disabledButton]}
           onPress={handleSearch}
           disabled={loading}
+          activeOpacity={0.9}
         >
-          <Text style={styles.searchButtonText}>
-            {loading ? 'Searching...' : 'Search Client'}
-          </Text>
+          {loading ? (
+            <View style={styles.searchButtonInner}>
+              <ActivityIndicator size="small" color="#FFFFFF" />
+              <View style={styles.searchButtonInnerSpacer} />
+              <Text style={styles.searchButtonText}>Searching...</Text>
+            </View>
+          ) : (
+            <Text style={styles.searchButtonText}>Search Client</Text>
+          )}
         </TouchableOpacity>
+
+        <Text style={styles.microHelp}>
+          Tip: Use the court location to reduce mismatches.
+        </Text>
       </View>
 
       <View style={styles.blockCard}>
         <View style={styles.historyHeader}>
           <Text style={styles.cardTitle}>Recent Searches</Text>
           {history.length > 0 && (
-            <TouchableOpacity onPress={handleClearHistory}>
+            <TouchableOpacity onPress={handleClearHistory} disabled={loading}>
               <Text style={styles.clearText}>Clear All</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {history.length === 0 ? (
-          <Text style={styles.emptyText}>No recent searches yet</Text>
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>No recent searches yet</Text>
+            <Text style={styles.emptyText}>
+              Your last searches will appear here for quick access.
+            </Text>
+          </View>
         ) : (
           history.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={styles.historyCard}
               onPress={() => handleHistorySelect(item)}
+              disabled={loading}
             >
-              <Text style={styles.clientNameText}>{item.fullName}</Text>
-              <Text style={styles.clientMetaText}>
-                {item.courtLocation || 'No location'} • {item.caseTypeHint || 'No case type'}
-              </Text>
+              <View style={styles.historyMainRow}>
+                <View style={styles.historyTextBlock}>
+                  <Text style={styles.clientNameText}>{item.fullName}</Text>
+                  <Text style={styles.clientMetaText} numberOfLines={2}>
+                    {item.courtLocation || 'No location'} • {item.caseTypeHint || 'No case type'}
+                  </Text>
+                </View>
+                <Text style={styles.historyChevron}>›</Text>
+              </View>
             </TouchableOpacity>
           ))
         )}
@@ -259,12 +355,12 @@ export default SearchClientScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#EEF2F7',
+    backgroundColor: colors.appBg,
     flexGrow: 1,
   },
   topBar: {
     marginTop: 8,
-    marginBottom: 22,
+    marginBottom: 18,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -275,26 +371,26 @@ const styles = StyleSheet.create({
   },
   smallTitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: colors.textMuted,
     fontWeight: '700',
     marginBottom: 4,
   },
   pageTitle: {
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: '900',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 6,
   },
   pageSubtitle: {
     fontSize: 14,
-    color: '#64748B',
+    color: colors.textMuted,
     lineHeight: 20,
   },
   profileButton: {
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#0F172A',
+    backgroundColor: colors.navy,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -304,31 +400,69 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   formCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     borderRadius: 28,
     padding: 22,
     marginBottom: 18,
-    shadowColor: '#0F172A',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.07,
     shadowRadius: 16,
     elevation: 3,
   },
   blockCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     borderRadius: 28,
     padding: 22,
     marginBottom: 18,
-    shadowColor: '#0F172A',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.06,
     shadowRadius: 14,
     elevation: 2,
   },
+  stepsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  stepItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  stepDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  stepDotActive: {
+    backgroundColor: '#2563EB',
+  },
+  stepDotInactive: {
+    backgroundColor: '#CBD5E1',
+  },
+  stepLabel: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#64748B',
+  },
+  stepLabelActive: {
+    color: '#0F172A',
+  },
+  stepDivider: {
+    flex: 1,
+    height: 2,
+    backgroundColor: '#E2E8F0',
+    marginHorizontal: 10,
+  },
+  stepDividerActive: {
+    backgroundColor: '#93C5FD',
+  },
   cardTitle: {
     fontSize: 21,
     fontWeight: '900',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 16,
   },
   inputGroup: {
@@ -350,14 +484,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#0F172A',
   },
+  locationInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationInputFlex: {
+    flex: 1,
+  },
   clearLocationButton: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    marginLeft: 8,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   clearLocationText: {
     color: '#DC2626',
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '900',
+    lineHeight: 18,
   },
   locationDropdown: {
     backgroundColor: '#FFFFFF',
@@ -383,6 +530,12 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 14,
   },
+  hintText: {
+    marginTop: 8,
+    color: '#64748B',
+    fontSize: 13,
+    fontWeight: '700',
+  },
   searchButton: {
     backgroundColor: '#1D4ED8',
     paddingVertical: 16,
@@ -390,6 +543,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 6,
   },
+  searchButtonInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchButtonInnerSpacer: {
+    width: 10,
+  },
+
   disabledButton: {
     backgroundColor: '#94A3B8',
   },
@@ -397,6 +559,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '900',
+  },
+  microHelp: {
+    marginTop: 10,
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: '700',
   },
   historyHeader: {
     flexDirection: 'row',
@@ -408,15 +576,39 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 13,
   },
+  emptyCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 18,
+    padding: 22,
+    marginTop: 14,
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#0F172A',
+    marginBottom: 6,
+  },
   emptyText: {
-    color: '#64748B',
     fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   historyCard: {
     backgroundColor: '#F8FAFC',
     borderRadius: 16,
     padding: 14,
     marginBottom: 10,
+  },
+  historyMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  historyTextBlock: {
+    flex: 1,
+    marginRight: 10,
   },
   clientNameText: {
     fontSize: 16,
@@ -428,4 +620,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#64748B',
   },
+  historyChevron: {
+    fontSize: 22,
+    color: '#2563EB',
+    fontWeight: '900',
+    paddingHorizontal: 6,
+  },
 });
+
