@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "case_name": "Tech Corp vs Innovate LLC",
+    "case_type": "Intellectual Property",
+    "legal_issues": ["Patent Infringement", "Trade Secret Misappropriation"],
+    "arguments": ["Unauthorized use of patented algorithm", "Breach of NDA"],
+    "outcome": "Settled out of court with licensing agreement",
+    "year": 2021,
+    "summary": "A major tech company sued a startup for allegedly using their patented search algorithm. The case was resolved before trial via a lucrative licensing deal."
+  },
+  {
+    "id": 2,
+    "case_name": "State vs Doe",
+    "case_type": "Criminal Defense",
+    "legal_issues": ["First-degree murder", "Self-defense"],
+    "arguments": ["Lack of prior intent", "Imminent threat to life"],
+    "outcome": "Acquitted based on self-defense",
+    "year": 2019,
+    "summary": "The defendant faced murder charges but successfully argued self-defense due to documented prior threats and an imminent attack by the deceased."
+  },
+  {
+    "id": 3,
+    "case_name": "Smith vs MegaMart",
+    "case_type": "Personal Injury",
+    "legal_issues": ["Premises liability", "Negligence"],
+    "arguments": ["Failure to maintain safe environment", "Lack of warning signs"],
+    "outcome": "Plaintiff awarded $150,000 in damages",
+    "year": 2022,
+    "summary": "A customer slipped on an unmarked wet floor in a supermarket, sustaining severe injuries. The jury found the store negligent for failing to follow safety protocols."
+  },
+  {
+    "id": 4,
+    "case_name": "Global Trade Co vs Ocean Freight Inc",
+    "case_type": "Contract Law",
+    "legal_issues": ["Breach of contract", "Force majeure"],
+    "arguments": ["Failure to deliver goods on time", "Unforeseeable weather events causing delay"],
+    "outcome": "Dismissed due to force majeure clause",
+    "year": 2020,
+    "summary": "A shipping company failed to deliver cargo on schedule due to an unexpected hurricane. The court ruled the delay was covered under the contract's force majeure clause."
+  },
+  {
+    "id": 5,
+    "case_name": "Johnson Estate vs Care Home",
+    "case_type": "Medical Malpractice",
+    "legal_issues": ["Wrongful death", "Medical negligence"],
+    "arguments": ["Failure to administer prescribed medication", "Inadequate staffing"],
+    "outcome": "Settled for $500,000",
+    "year": 2023,
+    "summary": "The family of a deceased elderly patient sued a care home for failing to provide adequate medical care, leading to the patient's untimely death. The care home settled before trial."
+  }
+]

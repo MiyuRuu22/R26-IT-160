@@ -1,0 +1,16 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.1
+sentence-transformers>=2.5.1
+faiss-cpu>=1.7.4
+numpy>=1.26.4
+pandas>=2.2.0
+pydantic>=2.6.0
+# B-Report Analysis
+pymupdf>=1.24.0
+pdfplumber>=0.11.0
+pytesseract>=0.3.13
+pillow>=10.0.0
+python-multipart>=0.0.9
+google-genai>=1.0.0
+spacy>=3.7.4
+neo4j>=5.17.0

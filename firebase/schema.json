@@ -1,0 +1,42 @@
+{
+  "collections": {
+    "users": {
+      "documentId": "uid",
+      "fields": {
+        "uid": "string",
+        "email": "string",
+        "displayName": "string",
+        "role": "string (lawyer | admin)",
+        "createdAt": "timestamp"
+      }
+    },
+    "cases": {
+      "documentId": "caseId",
+      "fields": {
+        "lawyerId": "reference(users)",
+        "caseTitle": "string",
+        "legalIssue": "string",
+        "status": "string (active | closed)",
+        "createdAt": "timestamp"
+      }
+    },
+    "caseAnalyses": {
+      "documentId": "analysisId",
+      "fields": {
+        "caseId": "reference(cases)",
+        "similarityScore": "number",
+        "recommendedStrategy": "string",
+        "precedents": "array(objects)",
+        "createdAt": "timestamp"
+      }
+    },
+    "riskAssessments": {
+      "documentId": "assessmentId",
+      "fields": {
+        "clientId": "string",
+        "riskScore": "number",
+        "indicators": "array(objects)"
+      }
+    }
+  }
+}
