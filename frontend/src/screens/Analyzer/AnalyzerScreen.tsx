@@ -103,7 +103,7 @@ export function AnalyzerScreen() {
 
   const handleAnalyze = async () => {
     if (!canAnalyze) return;
-    const success = await analyzeDefense(legalIssue, caseType, facts, outcome);
+    const success = await analyzeDefense(legalIssue, caseType, facts, outcome, caseTitle);
     if (success) {
       navigation.navigate('DefenseResults');
     }

@@ -13,6 +13,8 @@ import { DashboardScreen } from '../screens/Dashboard/DashboardScreen';
 import { AnalyzerScreen } from '../screens/Analyzer/AnalyzerScreen';
 import { ResultsScreen } from '../screens/Analyzer/ResultsScreen';
 import { DefenseResultsScreen } from '../screens/Analyzer/DefenseResultsScreen';
+import { AddCaseDetailsScreen } from '../screens/Analyzer/AddCaseDetailsScreen';
+import { ReAnalysisLoadingScreen } from '../screens/Analyzer/ReAnalysisLoadingScreen';
 import { DraftAssistantScreen } from '../screens/Drafts/DraftAssistantScreen';
 import { RelationshipGraphScreen } from '../screens/Graph/RelationshipGraphScreen';
 import { RiskAssessmentScreen } from '../screens/Risk/RiskAssessmentScreen';
@@ -36,6 +38,8 @@ function AnalyzerStack() {
       <Stack.Screen name="AnalyzerForm" component={AnalyzerScreen} />
       <Stack.Screen name="Results" component={ResultsScreen} />
       <Stack.Screen name="DefenseResults" component={DefenseResultsScreen} />
+      <Stack.Screen name="AddCaseDetails" component={AddCaseDetailsScreen} />
+      <Stack.Screen name="ReAnalysisLoading" component={ReAnalysisLoadingScreen} />
     </Stack.Navigator>
   );
 }
