@@ -15,6 +15,7 @@ import { ResultsScreen } from '../screens/Analyzer/ResultsScreen';
 import { DefenseResultsScreen } from '../screens/Analyzer/DefenseResultsScreen';
 import { AddCaseDetailsScreen } from '../screens/Analyzer/AddCaseDetailsScreen';
 import { ReAnalysisLoadingScreen } from '../screens/Analyzer/ReAnalysisLoadingScreen';
+import { CaseAssistantScreen } from '../screens/Analyzer/CaseAssistantScreen';
 import { DraftAssistantScreen } from '../screens/Drafts/DraftAssistantScreen';
 import { RelationshipGraphScreen } from '../screens/Graph/RelationshipGraphScreen';
 import { RiskAssessmentScreen } from '../screens/Risk/RiskAssessmentScreen';
@@ -40,9 +41,11 @@ function AnalyzerStack() {
       <Stack.Screen name="DefenseResults" component={DefenseResultsScreen} />
       <Stack.Screen name="AddCaseDetails" component={AddCaseDetailsScreen} />
       <Stack.Screen name="ReAnalysisLoading" component={ReAnalysisLoadingScreen} />
+      <Stack.Screen name="CaseAssistant" component={CaseAssistantScreen} />
     </Stack.Navigator>
   );
 }
+
 
 function AppTabs() {
   return (
@@ -111,7 +114,10 @@ export function RootNavigator() {
     <NavigationContainer theme={PaperTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
         {user ? (
-          <Stack.Screen name="App" component={AppTabs} />
+          <Stack.Group>
+            <Stack.Screen name="App" component={AppTabs} />
+            <Stack.Screen name="CaseAssistant" component={CaseAssistantScreen} />
+          </Stack.Group>
         ) : (
           <Stack.Group>
             <Stack.Screen name="Landing" component={LandingScreen} />

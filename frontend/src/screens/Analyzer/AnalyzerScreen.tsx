@@ -123,7 +123,13 @@ export function AnalyzerScreen() {
         backgroundColor: PALETTE.white,
       }}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('Opponent');
+            }
+          }}
           style={{
             width: 32, height: 32, borderRadius: 16,
             borderWidth: 1, borderColor: PALETTE.ink,
@@ -145,6 +151,62 @@ export function AnalyzerScreen() {
         }}>
           <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 12, color: PALETTE.ink }}>⚖</Text>
         </View>
+      </View>
+
+      {/* ── Segmented Navigation Control: [ ⚖ Analyzer ] [ 🛡 Defense ] ── */}
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: '#e8e4da',
+        padding: 3,
+        borderRadius: 12,
+        marginHorizontal: 16,
+        marginTop: 10,
+        marginBottom: 6,
+        borderWidth: 1,
+        borderColor: PALETTE.border,
+      }}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 8,
+            borderRadius: 9,
+            backgroundColor: PALETTE.ink,
+            gap: 6,
+          }}
+          activeOpacity={0.9}
+          accessibilityRole="tab"
+          accessibilityLabel="Defense Analyzer (Active)"
+        >
+          <Text style={{ fontSize: 13 }}>⚖</Text>
+          <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 12, color: PALETTE.paper }}>
+            Analyzer
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Opponent')}
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 8,
+            borderRadius: 9,
+            backgroundColor: 'transparent',
+            gap: 6,
+          }}
+          activeOpacity={0.8}
+          accessibilityRole="tab"
+          accessibilityLabel="Navigate to Defense & Opponent Prediction"
+        >
+          <Text style={{ fontSize: 13 }}>🛡</Text>
+          <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 12, color: PALETTE.muted }}>
+            Defense
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView

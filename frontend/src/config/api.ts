@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
     AI_SEARCH: `${AI_BASE_URL}/search`,
     // AI Engine — Defense Analyzer (text input)
     AI_ANALYZE: `${AI_BASE_URL}/analyze`,
-    // B-Report PDF analysis
-    AI_ANALYZE_PDF: `${AI_BREPORT_URL}/analyze-b-report`,
+    // Case Assistant Chatbot
+    CASE_CHAT: (caseId: string) => `${BASE_URL}/cases/${encodeURIComponent(caseId)}/chat`,
+    CASE_CONVERSATION: (caseId: string) => `${BASE_URL}/cases/${encodeURIComponent(caseId)}/conversation`,
 };
+

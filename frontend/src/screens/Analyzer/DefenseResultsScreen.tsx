@@ -30,6 +30,7 @@ import {
   OpponentTabData,
   ArgumentPriority,
 } from '../../store/useAnalyzerStore';
+import { useOpponentStore } from '../../store/useOpponentStore';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -722,6 +723,34 @@ function OpponentArgumentsTab({ navigation }: { navigation: any }) {
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 60 }}>
       <OpponentSummaryRow summary={opponentTabData.summary} />
 
+      <TouchableOpacity
+        onPress={() => {
+          const { additionalDetails, originalInput } = useAnalyzerStore.getState();
+          useOpponentStore.getState().importFromAnalyzerStore(additionalDetails, originalInput);
+          navigation.navigate('Opponent');
+        }}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: '#0e0e0c',
+          borderRadius: 6,
+          padding: 12,
+          marginBottom: 14,
+        }}
+        activeOpacity={0.85}
+      >
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 13, color: '#f4f1ea', marginBottom: 2 }}>
+            Deep 14-Section Adversarial Analysis
+          </Text>
+          <Text style={{ fontFamily: 'InterTight_400Regular', fontSize: 10, color: 'rgba(244,241,234,0.7)' }}>
+            Switch to Opponent Predictor with all current case evidence and forensic data.
+          </Text>
+        </View>
+        <Text style={{ color: '#fb923c', fontSize: 16 }}>→</Text>
+      </TouchableOpacity>
+
       <Text style={{ fontFamily: 'InterTight_400Regular', fontSize: 9.5, color: P.muted, lineHeight: 14, marginBottom: 14, backgroundColor: '#fffef7', borderWidth: 1, borderColor: '#fde68a', borderRadius: 4, padding: 10 }}>
         These are system-generated potential arguments based on the available case information and relevant legal patterns. They are advisory and must be reviewed and validated by a qualified legal professional.
       </Text>
@@ -843,8 +872,34 @@ export function DefenseResultsScreen() {
             <Text style={{ fontFamily: 'JetBrainsMono_500Medium', fontSize: 8.5, color: P.muted }}>v{currentVersionItem.version} · {currentVersionItem.formattedDate}</Text>
           )}
         </View>
-        <View style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: P.border, backgroundColor: P.paper2, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 12, color: P.ink }}>⚖</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CaseAssistant', {
+              caseId: currentVersionItem?.version ? `v${currentVersionItem.version}` : 'active-case',
+              caseTitle: r.detected_label || 'Current Case',
+            })}
+            activeOpacity={0.8}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+              paddingHorizontal: 9,
+              paddingVertical: 5,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: P.ink,
+              backgroundColor: P.paper,
+            }}
+          >
+            <Text style={{ fontSize: 11 }}>💬</Text>
+            <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 10.5, color: P.ink }}>
+              Assistant
+            </Text>
+          </TouchableOpacity>
+
+          <View style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: P.border, backgroundColor: P.paper2, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 12, color: P.ink }}>⚖</Text>
+          </View>
         </View>
       </View>
 
@@ -954,6 +1009,40 @@ export function DefenseResultsScreen() {
       {activeTab === 'opponent' && (
         <OpponentArgumentsTab navigation={navigation} />
       )}
+
+      {/* Floating Case Assistant Action Button */}
+      <TouchableOpacity
+        activeOpacity={0.88}
+        onPress={() => navigation.navigate('CaseAssistant', {
+          caseId: currentVersionItem?.version ? `v${currentVersionItem.version}` : 'active-case',
+          caseTitle: r.detected_label || 'Current Case',
+        })}
+        style={{
+          position: 'absolute',
+          bottom: 18,
+          right: 16,
+          backgroundColor: P.ink,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 10,
+          paddingHorizontal: 15,
+          borderRadius: 24,
+          gap: 6,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.25,
+          shadowRadius: 5,
+          elevation: 6,
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.2)',
+          zIndex: 999,
+        }}
+      >
+        <Text style={{ fontSize: 13 }}>💬</Text>
+        <Text style={{ fontFamily: 'InterTight_600SemiBold', fontSize: 11.5, color: P.paper }}>
+          Case Assistant
+        </Text>
+      </TouchableOpacity>
 
     </SafeAreaView>
   );

@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
 
 const opponentSessionSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // optional if unauthenticated
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     defenseArguments: { type: String, required: true },
     charges: { type: String, required: true },
+    caseType: { type: String, default: 'Criminal' },
     hearingNotes: { type: String },
     witnessSummaries: { type: String },
     evidenceSummaries: { type: String },
     legalSections: { type: String },
+    
+    // Complete incoming case context
+    caseData: { type: mongoose.Schema.Types.Mixed },
+
+    // Comprehensive 14-section adversarial analysis
+    adversarialAnalysis: { type: mongoose.Schema.Types.Mixed },
+
+    // Legacy fields preserved for backward compatibility
     analysisResults: {
         weaknesses: [{
             pattern: String,
