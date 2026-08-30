@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { colors } from '../../theme/colors';
+import { RADIUS, SCREEN_PADDING } from '../../constants/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { searchClients } from '../../services/api/clientApi';
@@ -294,7 +295,7 @@ const SearchClientScreen = ({ navigation }: Props) => {
         >
           {loading ? (
             <View style={styles.searchButtonInner}>
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color={colors.cardBg} />
               <View style={styles.searchButtonInnerSpacer} />
               <Text style={styles.searchButtonText}>Searching...</Text>
             </View>
@@ -354,7 +355,7 @@ export default SearchClientScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: SCREEN_PADDING,
     backgroundColor: colors.appBg,
     flexGrow: 1,
   },
@@ -395,13 +396,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileButtonText: {
-    color: '#FFFFFF',
+    color: colors.cardBg,
     fontSize: 18,
     fontWeight: '900',
   },
   formCard: {
     backgroundColor: colors.cardBg,
-    borderRadius: 28,
+    borderRadius: RADIUS,
     padding: 22,
     marginBottom: 18,
     shadowColor: colors.shadow,
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
   },
   blockCard: {
     backgroundColor: colors.cardBg,
-    borderRadius: 28,
+    borderRadius: RADIUS,
     padding: 22,
     marginBottom: 18,
     shadowColor: colors.shadow,
@@ -437,7 +438,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   stepDotActive: {
-    backgroundColor: '#2563EB',
+    backgroundColor: colors.primary,
   },
   stepDotInactive: {
     backgroundColor: '#CBD5E1',
@@ -445,15 +446,15 @@ const styles = StyleSheet.create({
   stepLabel: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#64748B',
+    color: colors.textMuted,
   },
   stepLabelActive: {
-    color: '#0F172A',
+    color: colors.text,
   },
   stepDivider: {
     flex: 1,
     height: 2,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: colors.divider,
     marginHorizontal: 10,
   },
   stepDividerActive: {
@@ -471,18 +472,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#334155',
+    color: colors.textSubtle,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.inputBg,
     borderWidth: 1,
-    borderColor: '#D8DEE8',
+    borderColor: colors.border,
     borderRadius: 16,
     paddingVertical: 15,
     paddingHorizontal: 16,
     fontSize: 15,
-    color: '#0F172A',
+    color: colors.text,
   },
   locationInputRow: {
     flexDirection: 'row',
@@ -501,15 +502,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clearLocationText: {
-    color: '#DC2626',
+    color: colors.danger,
     fontSize: 18,
     fontWeight: '900',
     lineHeight: 18,
   },
   locationDropdown: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
-    borderColor: '#D8DEE8',
+    borderColor: colors.border,
     borderRadius: 16,
     marginTop: 8,
     overflow: 'hidden',
@@ -518,26 +519,26 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: colors.divider,
   },
   locationText: {
     fontSize: 15,
-    color: '#0F172A',
+    color: colors.text,
     fontWeight: '700',
   },
   noLocationText: {
     padding: 14,
-    color: '#64748B',
+    color: colors.textMuted,
     fontSize: 14,
   },
   hintText: {
     marginTop: 8,
-    color: '#64748B',
+    color: colors.textMuted,
     fontSize: 13,
     fontWeight: '700',
   },
   searchButton: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: colors.primary2,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
@@ -556,13 +557,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#94A3B8',
   },
   searchButtonText: {
-    color: '#FFFFFF',
+    color: colors.cardBg,
     fontSize: 16,
     fontWeight: '900',
   },
   microHelp: {
     marginTop: 10,
-    color: '#64748B',
+    color: colors.textMuted,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -572,12 +573,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clearText: {
-    color: '#DC2626',
+    color: colors.danger,
     fontWeight: '800',
     fontSize: 13,
   },
   emptyCard: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.inputBg,
     borderRadius: 18,
     padding: 22,
     marginTop: 14,
@@ -586,17 +587,17 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 17,
     fontWeight: '900',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 6,
   },
   emptyText: {
     fontSize: 14,
-    color: '#64748B',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },
   historyCard: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.inputBg,
     borderRadius: 16,
     padding: 14,
     marginBottom: 10,
@@ -613,18 +614,17 @@ const styles = StyleSheet.create({
   clientNameText: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 4,
   },
   clientMetaText: {
     fontSize: 13,
-    color: '#64748B',
+    color: colors.textMuted,
   },
   historyChevron: {
     fontSize: 22,
-    color: '#2563EB',
+    color: colors.primary,
     fontWeight: '900',
     paddingHorizontal: 6,
   },
 });
-

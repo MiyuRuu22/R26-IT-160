@@ -17,6 +17,8 @@ import {
   removeSavedClient,
   SavedClientItem,
 } from '../../services/history/savedClients';
+import { colors } from '../../theme/colors';
+import { RADIUS, SCREEN_PADDING } from '../../constants/ui';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LawyerProfile'>;
 
@@ -35,8 +37,16 @@ const LawyerProfileScreen = ({ navigation }: Props) => {
   };
 
   const handleOpenSavedClient = (item: SavedClientItem) => {
+    if (!item.clientKey) {
+      Alert.alert(
+        'Unable to open client',
+        'This saved client was stored before client keys were supported. Please search and save the client again.'
+      );
+      return;
+    }
+
     navigation.navigate('ClientProfile', {
-      clientKey: item.fullName,
+      clientKey: item.clientKey,
     });
   };
 
@@ -87,11 +97,7 @@ const LawyerProfileScreen = ({ navigation }: Props) => {
             <View key={index} style={styles.savedClientRow}>
               <TouchableOpacity
                 style={styles.savedClientInfo}
-                onPress={() =>
-                  navigation.navigate('ClientProfile', {
-                    clientKey: item.fullName,
-                  })
-                }
+                onPress={() => handleOpenSavedClient(item)}
               >
                 <Text style={styles.savedClientName}>{item.fullName}</Text>
                 <Text style={styles.savedClientMeta}>
@@ -117,13 +123,13 @@ export default LawyerProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 18,
-    backgroundColor: '#F1F5F9',
+    padding: SCREEN_PADDING,
+    backgroundColor: colors.appBg,
     flexGrow: 1,
   },
   profileCard: {
-    backgroundColor: '#1E3A8A',
-    borderRadius: 22,
+    backgroundColor: colors.navy2,
+    borderRadius: RADIUS,
     padding: 24,
     alignItems: 'center',
     marginBottom: 18,
@@ -132,13 +138,13 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 14,
   },
   avatarText: {
-    color: '#1E3A8A',
+    color: colors.navy2,
     fontSize: 26,
     fontWeight: '800',
   },
@@ -150,39 +156,41 @@ const styles = StyleSheet.create({
   },
   profileEmail: {
     fontSize: 18,
-    color: '#FFFFFF',
+    color: colors.cardBg,
     fontWeight: '800',
     marginBottom: 16,
     textAlign: 'center',
   },
   logoutButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.cardBg,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 14,
   },
   logoutButtonText: {
-    color: '#1E3A8A',
+    color: colors.navy2,
     fontWeight: '800',
     fontSize: 14,
   },
   savedClientsCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS,
     padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 14,
   },
   emptyText: {
-    color: '#64748B',
+    color: colors.textMuted,
     fontSize: 14,
   },
   savedClientRow: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.inputBg,
     borderRadius: 14,
     padding: 12,
     marginBottom: 10,
@@ -195,12 +203,12 @@ const styles = StyleSheet.create({
   savedClientName: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 4,
   },
   savedClientMeta: {
     fontSize: 12,
-    color: '#64748B',
+    color: colors.textMuted,
   },
   removeButton: {
     backgroundColor: '#FEE2E2',
@@ -210,7 +218,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   removeButtonText: {
-    color: '#B91C1C',
+    color: colors.danger,
     fontWeight: '800',
     fontSize: 12,
   },

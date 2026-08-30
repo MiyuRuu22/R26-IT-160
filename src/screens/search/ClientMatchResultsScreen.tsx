@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { colors } from '../../theme/colors';
+import { RADIUS, SCREEN_PADDING } from '../../constants/ui';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ClientMatchResults'>;
 
@@ -81,7 +83,7 @@ const ClientMatchResultsScreen = ({ navigation, route }: Props) => {
       ) : (
         <FlatList
           data={matches}
-          keyExtractor={(item, index) => item.client_key || index.toString()}
+          keyExtractor={(item, index) => `${item.client_key}-${index}`}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
@@ -96,8 +98,8 @@ export default ClientMatchResultsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
-    padding: 18,
+    backgroundColor: colors.appBg,
+    padding: SCREEN_PADDING,
   },
   topArea: {
     marginTop: 8,
@@ -106,39 +108,48 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 6,
   },
   pageSubtitle: {
     fontSize: 14,
-    color: '#64748B',
+    color: colors.textMuted,
     lineHeight: 22,
   },
   searchInfoCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS,
     padding: 18,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   searchInfoTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 10,
   },
   searchInfoText: {
     fontSize: 14,
-    color: '#475569',
+    color: colors.textSubtle,
     marginBottom: 6,
   },
   listContent: {
     paddingBottom: 30,
   },
   resultCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS,
     padding: 18,
     marginBottom: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -153,15 +164,15 @@ const styles = StyleSheet.create({
   clientName: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 6,
   },
   clientMeta: {
     fontSize: 13,
-    color: '#64748B',
+    color: colors.textMuted,
   },
   countBadge: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: colors.chipBlue,
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 14,
@@ -169,40 +180,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   countBadgeText: {
-    color: '#1D4ED8',
+    color: colors.primary2,
     fontWeight: '800',
     fontSize: 16,
   },
   infoRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     marginBottom: 10,
   },
   sourceBadge: {
-    backgroundColor: '#EDE9FE',
+    backgroundColor: colors.chipIndigo,
     paddingVertical: 7,
     paddingHorizontal: 12,
     borderRadius: 999,
     marginRight: 10,
+    marginBottom: 4,
+    maxWidth: '100%',
+    flexShrink: 1,
   },
   sourceBadgeText: {
     color: '#6D28D9',
     fontSize: 12,
     fontWeight: '800',
+    flexShrink: 1,
   },
   caseText: {
     fontSize: 13,
-    color: '#475569',
+    color: colors.textSubtle,
     fontWeight: '600',
+    flexShrink: 1,
+    marginBottom: 4,
   },
   tapText: {
     fontSize: 13,
-    color: '#2563EB',
+    color: colors.primary,
     fontWeight: '700',
   },
   emptyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS,
     padding: 24,
     alignItems: 'center',
     marginTop: 20,
@@ -210,12 +228,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#64748B',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 22,
   },

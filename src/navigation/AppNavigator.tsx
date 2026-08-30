@@ -7,6 +7,7 @@ import ClientProfileScreen from '../screens/client/ClientProfileScreen';
 import CasePdfScreen from '../screens/cases/CasePdfScreen';
 import ClientReportScreen from '../screens/reports/ClientReportScreen';
 import LawyerProfileScreen from '../screens/profile/LawyerProfileScreen';
+import { colors } from '../theme/colors';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -44,7 +45,16 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = ({ isLoggedIn }: AppNavigatorProps) => {
   return (
-    <Stack.Navigator initialRouteName={isLoggedIn ? 'SearchClient' : 'Login'}>
+    <Stack.Navigator
+      initialRouteName={isLoggedIn ? 'SearchClient' : 'Login'}
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.cardBg },
+        headerTintColor: colors.text,
+        headerTitleStyle: { color: colors.text, fontWeight: '800' },
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: colors.appBg },
+      }}
+    >
       <Stack.Screen
         name="Login"
         component={LoginScreen}

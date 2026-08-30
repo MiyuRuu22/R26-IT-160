@@ -4,6 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/services/firebase/firebaseConfig';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ActivityIndicator, View } from 'react-native';
+import { colors } from './src/theme/colors';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -25,8 +26,9 @@ export default function App() {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor: colors.appBg,
         }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }

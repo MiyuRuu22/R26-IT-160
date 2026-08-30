@@ -11,6 +11,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../services/firebase/firebaseConfig';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { colors } from '../../theme/colors';
+import { RADIUS, SCREEN_PADDING } from '../../constants/ui';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -91,24 +93,31 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: colors.appBg,
     justifyContent: 'center',
-    padding: 20,
+    padding: SCREEN_PADDING,
   },
   formCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS,
     padding: 22,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#0F172A',
+    color: colors.text,
     marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: 15,
-    color: '#64748B',
+    color: colors.textMuted,
     marginBottom: 22,
     lineHeight: 22,
   },
@@ -118,28 +127,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#334155',
+    color: colors.textSubtle,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.inputBg,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 14,
+    borderColor: colors.border,
+    borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: '#0F172A',
+    color: colors.text,
   },
   loginButton: {
-    backgroundColor: '#2563EB',
-    borderRadius: 14,
+    backgroundColor: colors.primary,
+    borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: colors.cardBg,
     fontSize: 16,
     fontWeight: '800',
   },
@@ -149,7 +158,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#64748B',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
   },

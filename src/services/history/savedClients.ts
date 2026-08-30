@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const SAVED_CLIENTS_KEY = 'saved_clients';
 
 export type SavedClientItem = {
+  clientKey?: string;
   fullName: string;
   courtLocation: string;
   caseTypeHint?: string;
@@ -23,12 +24,14 @@ export const saveClientToFavorites = async (item: SavedClientItem) => {
   try {
     const existing = await getSavedClients();
 
-    const alreadyExists = existing.some(
-      client =>
-        client.fullName === item.fullName &&
-        client.courtLocation === item.courtLocation &&
-        client.caseTypeHint === item.caseTypeHint
-    );
+    const alreadyExists = item.clientKey
+      ? existing.some(client => client.clientKey === item.clientKey)
+      : existing.some(
+          client =>
+            client.fullName === item.fullName &&
+            client.courtLocation === item.courtLocation &&
+            client.caseTypeHint === item.caseTypeHint
+        );
 
     if (alreadyExists) return;
 
@@ -43,14 +46,16 @@ export const removeSavedClient = async (item: SavedClientItem) => {
   try {
     const existing = await getSavedClients();
 
-    const updated = existing.filter(
-      client =>
-        !(
-          client.fullName === item.fullName &&
-          client.courtLocation === item.courtLocation &&
-          client.caseTypeHint === item.caseTypeHint
-        )
-    );
+    const updated = item.clientKey
+      ? existing.filter(client => client.clientKey !== item.clientKey)
+      : existing.filter(
+          client =>
+            !(
+              client.fullName === item.fullName &&
+              client.courtLocation === item.courtLocation &&
+              client.caseTypeHint === item.caseTypeHint
+            )
+        );
 
     await AsyncStorage.setItem(SAVED_CLIENTS_KEY, JSON.stringify(updated));
   } catch (error) {
