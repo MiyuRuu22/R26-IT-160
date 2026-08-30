@@ -23,6 +23,7 @@ import OpponentPredictionScreen from '../screens/OpponentPredictionScreen';
 import { LandingScreen } from '../screens/Landing/LandingScreen';
 
 import { DefenderLandingScreen } from '../screens/Defender/DefenderLandingScreen';
+import { CaseHistoryScreen } from '../screens/Defender/CaseHistoryScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,6 +40,7 @@ function DefenderStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="DefenderLanding">
       <Stack.Screen name="DefenderLanding" component={DefenderLandingScreen} />
+      <Stack.Screen name="CaseHistory" component={CaseHistoryScreen} />
       <Stack.Screen name="AnalyzerForm" component={AnalyzerScreen} />
       <Stack.Screen name="Analyzer" component={AnalyzerScreen} />
       <Stack.Screen name="Results" component={ResultsScreen} />

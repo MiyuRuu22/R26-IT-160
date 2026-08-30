@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { Scale, Shield, ArrowRight, Sparkles, FileText, Crosshair, Bot, AlertTriangle } from 'lucide-react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { Scale, Shield, ArrowRight, Sparkles, FileText, Crosshair, Bot, AlertTriangle, FolderOpen } from 'lucide-react-native';
+import { useCaseHistoryStore } from '../../store/useCaseHistoryStore';
 
 const PALETTE = {
   ink: '#0e0e0c',
@@ -23,6 +25,13 @@ const PALETTE = {
 
 export function DefenderLandingScreen() {
   const navigation = useNavigation<any>();
+  const { recentCases, isLoading, fetchRecentCases, restoreCase } = useCaseHistoryStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchRecentCases();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: PALETTE.paper }} edges={['top']}>
@@ -75,7 +84,7 @@ export function DefenderLandingScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Header Title & Subtitle ── */}
@@ -226,7 +235,7 @@ export function DefenderLandingScreen() {
             backgroundColor: '#0c0f17',
             borderRadius: 16,
             padding: 18,
-            marginBottom: 20,
+            marginBottom: 16,
             borderWidth: 1,
             borderColor: '#1e293b',
             shadowColor: '#000',
@@ -340,6 +349,7 @@ export function DefenderLandingScreen() {
           padding: 14,
           borderWidth: 1,
           borderColor: PALETTE.border,
+          marginBottom: 20,
         }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <Sparkles size={14} color={PALETTE.accent} />
@@ -361,6 +371,208 @@ export function DefenderLandingScreen() {
           }}>
             Start by analyzing case facts in Defense Analyzer. Once completed, tap "Import from Analyzer" in Opponent Prediction to instantly carry all details into your 14-section adversarial strategy session.
           </Text>
+        </View>
+
+        {/* ── CASE HISTORY SECTION ── */}
+        <View style={{ marginBottom: 16 }}>
+          {/* Header Row */}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+          }}>
+            <View style={{ flex: 1, marginRight: 8 }}>
+              <Text style={{
+                fontFamily: 'JetBrainsMono_600SemiBold',
+                fontSize: 11,
+                letterSpacing: 1.2,
+                textTransform: 'uppercase',
+                color: PALETTE.ink,
+              }}>
+                Case History
+              </Text>
+              <Text style={{
+                fontFamily: 'InterTight_400Regular',
+                fontSize: 11.5,
+                color: PALETTE.muted,
+                marginTop: 2,
+              }}>
+                View and continue previously analyzed cases
+              </Text>
+            </View>
+
+            {recentCases.length > 0 && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('CaseHistory')}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 5,
+                  paddingHorizontal: 9,
+                  borderRadius: 8,
+                  backgroundColor: PALETTE.paper2,
+                  borderWidth: 1,
+                  borderColor: PALETTE.border,
+                  gap: 4,
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={{
+                  fontFamily: 'InterTight_600SemiBold',
+                  fontSize: 11,
+                  color: PALETTE.ink,
+                }}>
+                  View All
+                </Text>
+                <ArrowRight size={12} color={PALETTE.ink} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* List or Empty State */}
+          {isLoading && recentCases.length === 0 ? (
+            <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+              <ActivityIndicator size="small" color={PALETTE.ink} />
+            </View>
+          ) : recentCases.length === 0 ? (
+            <View style={{
+              backgroundColor: PALETTE.white,
+              borderRadius: 14,
+              padding: 20,
+              borderWidth: 1,
+              borderColor: PALETTE.border,
+              alignItems: 'center',
+              marginTop: 4,
+            }}>
+              <FolderOpen size={24} color={PALETTE.muted} style={{ marginBottom: 8 }} />
+              <Text style={{
+                fontFamily: 'Fraunces_600SemiBold',
+                fontSize: 14,
+                color: PALETTE.ink,
+                marginBottom: 4,
+              }}>
+                No cases analyzed yet
+              </Text>
+              <Text style={{
+                fontFamily: 'InterTight_400Regular',
+                fontSize: 11.5,
+                color: PALETTE.muted,
+                textAlign: 'center',
+                lineHeight: 16,
+                marginBottom: 12,
+              }}>
+                Cases you analyze using Defender will appear here.
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AnalyzerForm')}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  paddingHorizontal: 14,
+                  paddingVertical: 7,
+                  borderRadius: 8,
+                  backgroundColor: PALETTE.ink,
+                }}
+              >
+                <Sparkles size={12} color={PALETTE.paper} />
+                <Text style={{
+                  fontFamily: 'InterTight_600SemiBold',
+                  fontSize: 11,
+                  color: PALETTE.paper,
+                }}>
+                  Start Analysis
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={{ gap: 10, marginTop: 4 }}>
+              {recentCases.slice(0, 3).map((item) => {
+                const isAnalyzer = item.analysisType === 'ANALYZER';
+                const dateStr = item.updatedAt
+                  ? new Date(item.updatedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Recently';
+
+                return (
+                  <TouchableOpacity
+                    key={item.caseId}
+                    onPress={() => restoreCase(item, navigation)}
+                    activeOpacity={0.85}
+                    style={{
+                      backgroundColor: PALETTE.white,
+                      borderRadius: 12,
+                      padding: 14,
+                      borderWidth: 1,
+                      borderColor: PALETTE.border,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.03,
+                      shadowRadius: 3,
+                      elevation: 1,
+                    }}
+                  >
+                    <View style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      marginBottom: 6,
+                    }}>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          flex: 1,
+                          fontFamily: 'Fraunces_600SemiBold',
+                          fontSize: 14.5,
+                          color: PALETTE.ink,
+                          marginRight: 8,
+                        }}
+                      >
+                        {item.title}
+                      </Text>
+                      <ArrowRight size={14} color={PALETTE.ink} style={{ marginTop: 2 }} />
+                    </View>
+
+                    <View style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={{
+                          fontFamily: 'InterTight_500Medium',
+                          fontSize: 11,
+                          color: PALETTE.muted,
+                        }}>
+                          {item.caseType || 'Criminal'}
+                        </Text>
+                        <Text style={{ color: PALETTE.border }}>•</Text>
+                        <Text style={{
+                          fontFamily: 'JetBrainsMono_600SemiBold',
+                          fontSize: 10,
+                          color: isAnalyzer ? '#4338ca' : '#6d28d9',
+                        }}>
+                          {isAnalyzer ? 'Defense Analyzer' : 'Opponent Prediction'}
+                        </Text>
+                      </View>
+
+                      <Text style={{
+                        fontFamily: 'InterTight_400Regular',
+                        fontSize: 10.5,
+                        color: PALETTE.muted,
+                      }}>
+                        Analyzed {dateStr}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

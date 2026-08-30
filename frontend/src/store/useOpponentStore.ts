@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { BASE_URL } from '../config/api';
+import { useCaseHistoryStore } from './useCaseHistoryStore';
 
 // ── 14-Section Adversarial Analysis Types ───────────────────────────────────────
 
@@ -340,6 +341,24 @@ export const useOpponentStore = create<OpponentState>((set, get) => ({
                     isLoading: false,
                     error: null
                 });
+
+                // Automatically save to Case History
+                useCaseHistoryStore.getState().recordOpponentCase({
+                    charges: state.charges,
+                    defenseArguments: state.defenseArguments,
+                    caseType: state.caseType,
+                    caseFacts: state.caseFacts,
+                    adversarialAnalysis: resJson.data.adversarialAnalysis,
+                    caseData: {
+                        incidentLocation: state.incidentLocation,
+                        incidentDate: state.incidentDate,
+                        policeStation: state.policeStation,
+                        investigatingOfficer: state.investigatingOfficer,
+                        physicalEvidenceType: state.physicalEvidenceType,
+                        legalSections: state.legalSections,
+                        caseTitle: state.charges ? (state.charges.length > 35 ? state.charges.slice(0, 35) + '...' : state.charges) : 'Adversarial Defense Case'
+                    }
+                }).catch(() => {});
             } else {
                 set({ error: resJson.message || 'Analysis failed to return structured results.', isLoading: false });
             }

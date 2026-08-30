@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { API_ENDPOINTS } from '../config/api';
+import { useCaseHistoryStore } from './useCaseHistoryStore';
 
 // ── Law search types (v4 — /search endpoint) ───────────────────────────────────
 export interface LawResult {
@@ -839,6 +840,17 @@ export const useAnalyzerStore = create<AnalyzerState>((set, get) => ({
           currentVersionIndex: 0,
           isLoading: false,
         });
+
+        // Automatically save to Case History
+        useCaseHistoryStore.getState().recordAnalyzerCase({
+          caseTitle: caseTitle || '',
+          caseType,
+          legalIssue,
+          facts,
+          desiredOutcome,
+          results: data,
+        }).catch(() => {});
+
         return true;
       } else {
         set({ error: 'Defense analysis returned no results.', isLoading: false });
@@ -959,6 +971,17 @@ export const useAnalyzerStore = create<AnalyzerState>((set, get) => ({
           currentVersionIndex: updatedHistory.length - 1,
           isLoading: false,
         });
+
+        // Automatically update Case History
+        useCaseHistoryStore.getState().recordAnalyzerCase({
+          caseTitle: details.caseTitle || originalInput.caseTitle || '',
+          caseType: details.caseType || originalInput.caseType,
+          legalIssue: originalInput.legalIssue,
+          facts: originalInput.facts,
+          desiredOutcome: originalInput.desiredOutcome,
+          results: data,
+          additionalDetails: details
+        }).catch(() => {});
 
         return true;
       } else {

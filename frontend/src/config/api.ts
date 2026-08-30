@@ -22,5 +22,7 @@ export const API_ENDPOINTS = {
     // Case Assistant Chatbot
     CASE_CHAT: (caseId: string) => `${BASE_URL}/cases/${encodeURIComponent(caseId)}/chat`,
     CASE_CONVERSATION: (caseId: string) => `${BASE_URL}/cases/${encodeURIComponent(caseId)}/conversation`,
+    // Defender Case History
+    DEFENDER_HISTORY: `${BASE_URL}/defender/history`,
 };
 

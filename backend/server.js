@@ -9,6 +9,7 @@ const graphRoutes = require('./routes/graphRoutes');
 const riskRoutes = require('./routes/riskRoutes');
 const bReportRoutes = require('./routes/bReportRoutes');
 const opponentRoutes = require('./routes/opponentRoutes');
+const caseHistoryRoutes = require('./routes/caseHistoryRoutes');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -32,6 +33,7 @@ app.use('/api/graph', graphRoutes);
 app.use('/api/risk', riskRoutes);
 app.use('/api/b-report', bReportRoutes);
 app.use('/api/opponent', opponentRoutes);
+app.use('/api/defender/history', caseHistoryRoutes);
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {
@@ -51,3 +53,4 @@ app.listen(PORT, () => {
     console.log(`🧠 AI Engine linked for Semantic Search`);
     console.log(`========================================\n`);
 });
+ 

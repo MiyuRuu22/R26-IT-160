@@ -9,7 +9,7 @@ const User = require('../models/User');
 const requireAuth = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization || req.headers.Authorization;
-        const xUserId = req.headers['x-user-id'] || req.body.userId || req.query.userId;
+        const xUserId = req.headers['x-user-id'] || req.body?.userId || req.query?.userId;
 
         let token = null;
         if (authHeader && authHeader.startsWith('Bearer ')) {
