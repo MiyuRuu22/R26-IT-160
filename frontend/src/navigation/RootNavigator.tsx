@@ -3,7 +3,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuthStore } from '../store/useAuthStore';
-import { Home, Scale, FileText, User, Crosshair } from 'lucide-react-native';
+import { Home, Scale, FileText, User, Crosshair, Shield } from 'lucide-react-native';
 
 // Screens
 import { LoginScreen } from '../screens/Auth/LoginScreen';
@@ -22,6 +22,8 @@ import { RiskAssessmentScreen } from '../screens/Risk/RiskAssessmentScreen';
 import OpponentPredictionScreen from '../screens/OpponentPredictionScreen';
 import { LandingScreen } from '../screens/Landing/LandingScreen';
 
+import { DefenderLandingScreen } from '../screens/Defender/DefenderLandingScreen';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -33,15 +35,19 @@ const PaperTheme = {
   },
 };
 
-function AnalyzerStack() {
+function DefenderStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="DefenderLanding">
+      <Stack.Screen name="DefenderLanding" component={DefenderLandingScreen} />
       <Stack.Screen name="AnalyzerForm" component={AnalyzerScreen} />
+      <Stack.Screen name="Analyzer" component={AnalyzerScreen} />
       <Stack.Screen name="Results" component={ResultsScreen} />
       <Stack.Screen name="DefenseResults" component={DefenseResultsScreen} />
       <Stack.Screen name="AddCaseDetails" component={AddCaseDetailsScreen} />
       <Stack.Screen name="ReAnalysisLoading" component={ReAnalysisLoadingScreen} />
       <Stack.Screen name="CaseAssistant" component={CaseAssistantScreen} />
+      <Stack.Screen name="OpponentPrediction" component={OpponentPredictionScreen} />
+      <Stack.Screen name="Opponent" component={OpponentPredictionScreen} />
     </Stack.Navigator>
   );
 }
@@ -69,9 +75,12 @@ function AppTabs() {
         options={{ tabBarIcon: ({ color }) => <Home color={color} size={24} /> }}
       />
       <Tab.Screen 
-        name="Analyzer" 
-        component={AnalyzerStack} 
-        options={{ tabBarIcon: ({ color }) => <Scale color={color} size={24} /> }}
+        name="Defender" 
+        component={DefenderStack} 
+        options={{ 
+          tabBarLabel: 'Defender',
+          tabBarIcon: ({ color }) => <Shield color={color} size={24} /> 
+        }}
       />
       <Tab.Screen 
         name="Drafts" 
@@ -87,11 +96,6 @@ function AppTabs() {
         name="Risk" 
         component={RiskAssessmentScreen} 
         options={{ tabBarIcon: ({ color }) => <User color={color} size={24} /> }}
-      />
-      <Tab.Screen 
-        name="Opponent" 
-        component={OpponentPredictionScreen} 
-        options={{ tabBarIcon: ({ color }) => <Crosshair color={color} size={24} /> }}
       />
     </Tab.Navigator>
   );

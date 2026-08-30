@@ -164,15 +164,19 @@ export default function OpponentPredictionScreen() {
                 <View className="mb-4">
                     <View className="flex-row items-center justify-between mb-1">
                         <View className="flex-row items-center gap-2 flex-1 mr-2">
-                            {navigation.canGoBack() && (
-                                <TouchableOpacity
-                                    onPress={() => navigation.goBack()}
-                                    className="w-7 h-7 rounded-full border border-gray-700 bg-gray-900 items-center justify-center"
-                                    accessibilityLabel="Go back"
-                                >
-                                    <Text className="text-white text-xs font-semibold">←</Text>
-                                </TouchableOpacity>
-                            )}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (navigation.canGoBack()) {
+                                        navigation.goBack();
+                                    } else {
+                                        navigation.navigate('DefenderLanding');
+                                    }
+                                }}
+                                className="w-7 h-7 rounded-full border border-gray-700 bg-gray-900 items-center justify-center"
+                                accessibilityLabel="Go back to Defender"
+                            >
+                                <Text className="text-white text-xs font-semibold">←</Text>
+                            </TouchableOpacity>
                             <Text className="text-2xl font-bold text-white tracking-tight" style={{ fontFamily: 'Fraunces_700Bold' }}>
                                 Opponent Prediction
                             </Text>
@@ -200,7 +204,7 @@ export default function OpponentPredictionScreen() {
                 <View className="flex-row bg-gray-900/90 p-1 rounded-xl border border-gray-800 mb-4 shadow-sm">
                     <TouchableOpacity
                         onPress={() => {
-                            navigation.navigate('Analyzer', { screen: 'AnalyzerForm' });
+                            navigation.navigate('AnalyzerForm');
                         }}
                         className="flex-1 flex-row items-center justify-center gap-2 py-2.5 rounded-lg border border-transparent"
                         activeOpacity={0.8}

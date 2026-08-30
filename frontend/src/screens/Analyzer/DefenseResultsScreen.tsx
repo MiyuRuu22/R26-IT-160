@@ -727,7 +727,7 @@ function OpponentArgumentsTab({ navigation }: { navigation: any }) {
         onPress={() => {
           const { additionalDetails, originalInput } = useAnalyzerStore.getState();
           useOpponentStore.getState().importFromAnalyzerStore(additionalDetails, originalInput);
-          navigation.navigate('Opponent');
+          navigation.navigate('OpponentPrediction');
         }}
         style={{
           flexDirection: 'row',

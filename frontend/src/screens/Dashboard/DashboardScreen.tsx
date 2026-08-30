@@ -103,7 +103,7 @@ export function DashboardScreen() {
           </Card>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Analyzer')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Defender', { screen: 'AnalyzerForm' })}>
           <Card className="flex-row items-center p-3 mb-2 rounded-none border border-[#e0dbcb] bg-white">
             <View className="w-10 h-10 bg-paper2 border border-ink items-center justify-center mr-3">
               <Text style={{ fontFamily: 'Fraunces_400Regular_Italic', fontSize: 18 }} className="text-ink">iii</Text>

@@ -127,7 +127,7 @@ export function AnalyzerScreen() {
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
-              navigation.navigate('Opponent');
+              navigation.navigate('DefenderLanding');
             }
           }}
           style={{
@@ -187,7 +187,7 @@ export function AnalyzerScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('Opponent')}
+          onPress={() => navigation.navigate('OpponentPrediction')}
           style={{
             flex: 1,
             flexDirection: 'row',
