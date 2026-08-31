@@ -1,0 +1,685 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+
+html,
+body,
+#root {
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+body {
+
+  font-family: Inter, sans-serif;
+
+  background: #0f172a;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+
+.app-container {
+
+  width: 100vw;
+
+  height: 100vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #111827,
+      #1e293b
+    );
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar {
+
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0 25px;
+
+  background:
+    rgba(15, 23, 42, 0.92);
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(14px);
+
+  z-index: 50;
+
+  flex-shrink: 0;
+
+  text-align: center;
+}
+
+.topbar-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+.topbar-title {
+
+  color: white;
+
+  font-size: 20px;
+
+  font-weight: 700;
+}
+
+.topbar-subtitle {
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  margin-top: 2px;
+}
+
+/* =========================
+   DASHBOARD CONTROLS
+========================= */
+
+.dashboard-controls {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  background:
+    rgba(15, 23, 42, 0.92);
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.06);
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  flex-shrink: 0;
+}
+
+.control-group {
+
+  min-width: 220px;
+
+  max-width: 220px;
+
+  background:
+    rgba(255,255,255,0.03);
+
+  border:
+    1px solid rgba(255,255,255,0.05);
+
+  border-radius: 12px;
+
+  padding: 10px;
+
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-title {
+
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  margin-bottom: 8px;
+}
+
+.filter-label {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: white;
+
+  margin-bottom: 6px;
+
+  font-size: 13px;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.main-content {
+
+  flex: 1;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    240px;
+
+  overflow: hidden;
+
+  width: 100%;
+
+  height: 100%;
+}
+
+/* =========================
+   GRAPH AREA
+========================= */
+
+.graph-container {
+
+  width: 100%;
+
+  height: 100%;
+
+  position: relative;
+
+  overflow: hidden;
+
+  min-width: 0;
+}
+
+/* =========================
+   RIGHT PANEL
+========================= */
+
+.right-panel {
+
+  width: 240px;
+
+  background:
+    rgba(15, 23, 42, 0.82);
+
+  border-left:
+    1px solid rgba(255,255,255,0.05);
+
+  backdrop-filter: blur(18px);
+
+  padding: 12px;
+
+  overflow-y: auto;
+
+  overflow-x: hidden;
+
+  word-break: break-word;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  height: 100%;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input {
+
+  width: 100%;
+
+  padding: 8px 10px;
+
+  border-radius: 10px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.04);
+
+  color: white;
+
+  margin-bottom: 8px;
+
+  outline: none;
+
+  font-size: 13px;
+}
+
+.select {
+
+  width: 100%;
+
+  padding: 8px 10px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,0.04);
+
+  color: white;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  margin-bottom: 8px;
+
+  font-size: 13px;
+}
+
+.input:focus,
+.select:focus {
+
+  border:
+    1px solid #7c3aed;
+
+  box-shadow:
+    0 0 0 3px rgba(124,58,237,0.2);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.button {
+
+  width: 100%;
+
+  padding: 8px 10px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+
+  margin-bottom: 8px;
+
+  font-size: 13px;
+}
+
+.button:hover {
+
+  transform: translateY(-2px);
+
+  opacity: 0.95;
+}
+
+.primary-btn {
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #6366f1
+    );
+}
+
+.secondary-btn {
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #3b82f6
+    );
+}
+
+.danger-btn {
+
+  background:
+    linear-gradient(
+      135deg,
+      #dc2626,
+      #ef4444
+    );
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+
+  background:
+    rgba(255,255,255,0.04);
+
+  border:
+    1px solid rgba(255,255,255,0.05);
+
+  border-radius: 12px;
+
+  padding: 12px;
+
+  margin-bottom: 10px;
+
+  backdrop-filter: blur(8px);
+}
+
+.card-title {
+
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  margin-bottom: 8px;
+}
+
+/* =========================
+   ALERTS
+========================= */
+
+.alert-card {
+
+  padding: 10px;
+
+  border-radius: 10px;
+
+  margin-bottom: 8px;
+
+  color: white;
+}
+
+.alert-critical {
+
+  background:
+    linear-gradient(
+      135deg,
+      #991b1b,
+      #dc2626
+    );
+}
+
+.alert-high {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ea580c,
+      #f97316
+    );
+}
+
+.alert-medium {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ca8a04,
+      #facc15
+    );
+
+  color: black;
+}
+
+.alert-low {
+
+  background:
+    linear-gradient(
+      135deg,
+      #15803d,
+      #22c55e
+    );
+}
+
+.alert-title {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  margin-bottom: 5px;
+}
+
+.alert-description {
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  opacity: 0.9;
+
+  margin-bottom: 6px;
+}
+
+.alert-risk {
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  opacity: 0.8;
+}
+
+/* =========================
+   NODE INSPECTOR
+========================= */
+
+.property {
+
+  color: #cbd5e1;
+
+  margin-bottom: 10px;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  word-break: break-word;
+}
+
+.property strong {
+
+  color: white;
+}
+
+/* =========================
+   REACT FLOW
+========================= */
+
+.react-flow__node {
+
+  border-radius: 16px;
+}
+
+.react-flow__edge-text {
+
+  font-size: 13px !important;
+
+  font-weight: 700;
+}
+
+.react-flow__controls {
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  overflow: hidden;
+
+  border-radius: 12px;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+
+  width: 8px;
+
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+
+  background: #334155;
+
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+
+  background: transparent;
+}
+
+.selected-node-label {
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  margin-bottom: 10px;
+
+  line-height: 1.4;
+}
+
+.selected-node-type {
+
+  color: #94a3b8;
+
+  font-size: 14px;
+}
+
+.empty-node {
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+/* =========================
+   RISK SECTION
+========================= */
+
+.risk-section {
+
+  margin-top: 14px;
+}
+
+.risk-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+.risk-header h3 {
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 700;
+}
+
+.risk-btn {
+
+  padding: 6px 10px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #6366f1
+    );
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.risk-btn:hover {
+
+  opacity: 0.9;
+}
+
+.ai-summary-text {
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+  opacity: 0.95;
+
+  font-style: italic;
+}
+
+.graph-empty-state {
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  max-width: 340px;
+  padding: 18px 22px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #cbd5e1;
+  line-height: 1.6;
+  text-align: center;
+  pointer-events: none;
+}
+
+.graph-empty-state strong {
+
+  color: #f8fafc;
+}

@@ -1,0 +1,16 @@
+# Dependencies and local tooling
+**/node_modules/
+**/.expo/
+**/.expo-verify/
+**/__pycache__/
+*.py[cod]
+*.log
+
+# Server-side secrets. Commit lawyer-backend/.env.example instead.
+lawyer-backend/.env
+expo-mobile/.env
+
+# Generated pipeline output and local source documents are not required by an
+# integrating application. Keep the documented demo loaders in source control.
+ai-engine/output/
+ai-engine/data/pdfs/
