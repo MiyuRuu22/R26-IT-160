@@ -5,6 +5,7 @@
 **/__pycache__/
 *.py[cod]
 *.log
+*.zip
 
 # Server-side secrets. Commit lawyer-backend/.env.example instead.
 lawyer-backend/.env
